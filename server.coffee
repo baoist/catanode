@@ -46,16 +46,16 @@ app.get '/connect/:game_id', (req, res) ->
 Array::last = ->
   return this[this.length-1]
 
-String::port = ->
+String::port = -> # pulls port from a requesting url (the last character string)
   return parseInt(this.split('/').last().split(/[^0-9]/)[0])
 
 socket.sockets.on 'connection', (client) ->
   client.on 'join_lobby', (data) -> # any user joins the main lobby
     client.join data.game.port()
 
-  client.on 'join_chat', (data) ->
+  client.on 'join_chat', (data) -> # user connects via name input on lobby screen
     room = data.game.port()
-    if socket.rooms['/' + room].indexOf(client.id) > -1 # if user is in room
+    if socket.rooms['/' + room].indexOf(client.id) > -1
       lobbyist = games.add_lobby room, client.handshake.address, client.id, data.name
       if lobbyist
         socket.sockets.in(data.game.port()).emit 'message', { action: 'join', message: lobbyist.name + ' has connected to the server.'}
@@ -64,14 +64,14 @@ socket.sockets.on 'connection', (client) ->
   client.on 'join_game', (data) ->
     room = data.game.port()
     slot = if data.slot != -1 then data.slot else 1
-    if socket.rooms['/' + room].indexOf(client.id) > -1 # if user is in room
+    if socket.rooms['/' + room].indexOf(client.id) > -1
       player = games.add_player room, data.slot, data.name
       if player
         socket.sockets.in(room).emit 'join_game', { action: 'has joined the game.', name: data.name, slot: slot, icon: player.icon }
 
   client.on 'game_message', (data) ->
     room = data.game.port()
-    if socket.rooms['/' + room].indexOf(client.id) > -1 # if user is in room
+    if socket.rooms['/' + room].indexOf(client.id) > -1
       socket.sockets.in(room).emit 'message', { action: 'message', name: data.name, message: data.message }
 
 port = process.env.PORT || 8080
