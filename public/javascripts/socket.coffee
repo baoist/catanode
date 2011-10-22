@@ -1,5 +1,13 @@
 socket = io.connect('http://localhost/') # change to server.
 
+swap_chat = (name) ->
+  form = $('#set_name')
+  form
+    .attr('id', 'message')
+    .prepend('<h2>' + name + '</h2>')
+  form.find('input[type=submit]').val('Send')
+  $('input[type=text]').val('')
+
 jQuery(document).ready ->
   self = @
   self.username = 'Name'
@@ -17,6 +25,10 @@ jQuery(document).ready ->
     slot.append(name)
     slot.append(icon)
 
+  socket.on 'allowed_lobbyist', (data) ->
+    self.username = data.name
+    swap_chat(data.name)
+
   $('a.join').click (e) ->
     socket.emit 'join_game', { game: document.URL, slot: $('.player').index($(this).parent()) + 1, name: $(this).prev().val() }
 
@@ -28,18 +40,16 @@ jQuery(document).ready ->
 
   # chat
   $('#chat form').submit ->
-    socket.emit 'join_chat', { name: $(this).find('input[type=text]').val(), game: document.URL }
+    if $(this).attr('id') == 'set_name'
+      socket.emit 'join_chat', { name: $(this).find('input[type=text]').val(), game: document.URL }
+    else if $(this).attr('id') == 'message'
+      message = $(this).find('input[type=text]').val()
+      console.log message
+      if message
+        socket.emit 'game_message', { name: self.username || 'Name', message: message, game: document.URL }
+        $(this).prev().val('')
     return false
     
-  $('#chat a').click (e) ->
-    message = $(this).prev().val()
-    if message
-      socket.emit 'game_message', { name: self.username || 'Name', message: message, game: document.URL }
-      $(this).prev().val('')
-
-    e.stopPropagation()
-    e.preventDefault()
-
   socket.on 'message', (data) ->
     if data.action == 'join'
       message = data.message

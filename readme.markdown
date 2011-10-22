@@ -24,7 +24,7 @@ Page for when a user attempts to create a game when there is a limit
 
  * Consider how backbone will be organized.
  * Remember: structures, points, board, turns, reconnections, materials.
- * Rebuild socket.coffee as OO.
+ * REBUILD SOCKET.COFFEE AS OO.
 
 # Complete
 
