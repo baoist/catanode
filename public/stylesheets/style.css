@@ -23,7 +23,7 @@
   width: 100%;
 }
 
-#players .player a.join, #chat a {
+#players .player a.join, #chat input[type=submit] {
   color: #fff;
   background: rgb(204, 204, 204);
   -webkit-border-radius: 3px;
@@ -71,4 +71,17 @@
 
 #chat input {
   width: 80%;
+}
+
+#chat input[type=submit] {
+  width: 15%;
+  float: right;
+  outline: none;
+  border: none;
+  padding: 7px 7px 6px;
+  margin-top: 0;
+}
+
+#chat input[type=submit]:hover {
+  text-decoration: underline;
 }

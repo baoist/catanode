@@ -1,13 +1,13 @@
 (function() {
   var socket;
-  socket = io.connect('http://http://10.1.3.22/');
+  socket = io.connect('http://localhost/');
   jQuery(document).ready(function() {
     var self;
     self = this;
     self.username = 'Name';
     socket.on('connect', function(data) {
       return socket.emit('join_lobby', {
-        url: document.URL
+        game: document.URL
       });
     });
     socket.on('join_game', function(data) {
@@ -28,6 +28,16 @@
       });
       e.stopPropagation();
       return e.preventDefault();
+    });
+    $('input[type!=submit]').focus(function() {
+      return $(this).val('');
+    });
+    $('#chat form').submit(function() {
+      socket.emit('join_chat', {
+        name: $(this).find('input[type=text]').val(),
+        game: document.URL
+      });
+      return false;
     });
     $('#chat a').click(function(e) {
       var message;

@@ -1,9 +1,8 @@
 (function() {
-  var app, backbone, express, games, games_server, http, port, redis, socket, _;
+  var app, backbone, express, games, games_server, http, port, socket, _;
   http = require('http');
   _ = require('underscore');
   backbone = require('backbone');
-  redis = require('redis');
   express = require('express');
   app = express.createServer();
   socket = require('socket.io').listen(app);
@@ -56,11 +55,23 @@
   };
   socket.sockets.on('connection', function(client) {
     client.on('join_lobby', function(data) {
-      client.join(data.url.port());
-      return socket.sockets["in"](data.url.port()).emit('message', {
-        action: 'join',
-        message: 'User has connected to the server.'
-      });
+      return client.join(data.game.port());
+    });
+    client.on('join_chat', function(data) {
+      var lobbyist, room;
+      room = data.game.port();
+      if (socket.rooms['/' + room].indexOf(client.id) > -1) {
+        lobbyist = games.add_lobby(room, client.handshake.address, client.id, data.name);
+        if (lobbyist) {
+          socket.sockets["in"](data.game.port()).emit('message', {
+            action: 'join',
+            message: lobbyist.name + ' has connected to the server.'
+          });
+          return client.emit('allowed_lobbyist', {
+            name: lobbyist.name
+          });
+        }
+      }
     });
     client.on('join_game', function(data) {
       var player, room, slot;

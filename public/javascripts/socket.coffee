@@ -1,10 +1,10 @@
-socket = io.connect('http://http://10.1.3.22/') # change to server.
+socket = io.connect('http://localhost/') # change to server.
 
 jQuery(document).ready ->
   self = @
   self.username = 'Name'
   socket.on 'connect', (data) ->
-    socket.emit 'join_lobby', { url: document.URL }
+    socket.emit 'join_lobby', { game: document.URL }
 
   socket.on 'join_game', (data) ->
     slot = $($('.player')[data.slot-1])
@@ -22,8 +22,15 @@ jQuery(document).ready ->
 
     e.stopPropagation()
     e.preventDefault()
+  
+  $('input[type!=submit]').focus ->
+    $(this).val('')
 
   # chat
+  $('#chat form').submit ->
+    socket.emit 'join_chat', { name: $(this).find('input[type=text]').val(), game: document.URL }
+    return false
+    
   $('#chat a').click (e) ->
     message = $(this).prev().val()
     if message

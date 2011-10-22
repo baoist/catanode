@@ -2,8 +2,6 @@ http = require 'http'
 _ = require 'underscore'
 backbone = require 'backbone'
 
-redis = require('redis')#.createClient()
-
 express = require 'express'
 app = express.createServer()
 socket = require('socket.io').listen(app)
@@ -53,8 +51,15 @@ String::port = ->
 
 socket.sockets.on 'connection', (client) ->
   client.on 'join_lobby', (data) -> # any user joins the main lobby
-    client.join data.url.port()
-    socket.sockets.in(data.url.port()).emit 'message', { action: 'join', message: 'User has connected to the server.'}
+    client.join data.game.port()
+
+  client.on 'join_chat', (data) ->
+    room = data.game.port()
+    if socket.rooms['/' + room].indexOf(client.id) > -1 # if user is in room
+      lobbyist = games.add_lobby room, client.handshake.address, client.id, data.name
+      if lobbyist
+        socket.sockets.in(data.game.port()).emit 'message', { action: 'join', message: lobbyist.name + ' has connected to the server.'}
+        client.emit 'allowed_lobbyist', { name: lobbyist.name }
 
   client.on 'join_game', (data) ->
     room = data.game.port()

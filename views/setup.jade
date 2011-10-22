@@ -23,8 +23,9 @@ html(lang="en")
               a.join(href='#') Join
       #chat
         #display
-        input(type="text")
-        a.send(href="#") Send
+        form#set_name
+          input(type="text", value="Your Name Here.")
+          input(type="submit", value="Join Chat")
       #invite
         - if(url)
           hgroup
