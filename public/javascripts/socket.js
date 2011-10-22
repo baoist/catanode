@@ -31,6 +31,9 @@
       self.username = data.name;
       return swap_chat(data.name);
     });
+    socket.on('not_allowed_lobbyist', function(data) {
+      return alert(data.name + ' ' + data.message);
+    });
     $('a.join').click(function(e) {
       socket.emit('join_game', {
         game: document.URL,
@@ -52,7 +55,6 @@
         });
       } else if ($(this).attr('id') === 'message') {
         message = $(this).find('input[type=text]').val();
-        console.log(message);
         if (message) {
           socket.emit('game_message', {
             name: self.username || 'Name',

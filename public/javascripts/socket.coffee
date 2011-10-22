@@ -29,6 +29,9 @@ jQuery(document).ready ->
     self.username = data.name
     swap_chat(data.name)
 
+  socket.on 'not_allowed_lobbyist', (data) ->
+    alert data.name + ' ' + data.message
+    
   $('a.join').click (e) ->
     socket.emit 'join_game', { game: document.URL, slot: $('.player').index($(this).parent()) + 1, name: $(this).prev().val() }
 
@@ -44,7 +47,6 @@ jQuery(document).ready ->
       socket.emit 'join_chat', { name: $(this).find('input[type=text]').val(), game: document.URL }
     else if $(this).attr('id') == 'message'
       message = $(this).find('input[type=text]').val()
-      console.log message
       if message
         socket.emit 'game_message', { name: self.username || 'Name', message: message, game: document.URL }
         $(this).prev().val('')

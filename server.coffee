@@ -60,6 +60,8 @@ socket.sockets.on 'connection', (client) ->
       if lobbyist
         socket.sockets.in(data.game.port()).emit 'message', { action: 'join', message: lobbyist.name + ' has connected to the server.'}
         client.emit 'allowed_lobbyist', { name: lobbyist.name }
+      else
+        client.emit 'not_allowed_lobbyist', { name: data.name, message: 'is already taken in this chat.' }
 
   client.on 'join_game', (data) ->
     room = data.game.port()

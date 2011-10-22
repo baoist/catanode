@@ -70,6 +70,11 @@
           return client.emit('allowed_lobbyist', {
             name: lobbyist.name
           });
+        } else {
+          return client.emit('not_allowed_lobbyist', {
+            name: data.name,
+            message: 'is already taken in this chat.'
+          });
         }
       }
     });
