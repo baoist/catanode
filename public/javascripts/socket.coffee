@@ -49,7 +49,7 @@ jQuery(document).ready ->
       message = $(this).find('input[type=text]').val()
       if message
         socket.emit 'game_message', { name: self.username || 'Name', message: message, game: document.URL }
-        $(this).prev().val('')
+        $(this).find('input[type=text]').val('')
     return false
     
   socket.on 'message', (data) ->

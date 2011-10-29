@@ -61,7 +61,7 @@
             message: message,
             game: document.URL
           });
-          $(this).prev().val('');
+          $(this).find('input[type=text]').val('');
         }
       }
       return false;

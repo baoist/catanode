@@ -36,7 +36,10 @@ app.get '/connect', (req, res) ->
 
 app.get '/connect/:game_id', (req, res) ->
   if !games.list[req.params.game_id]
-    games.create(req.params.game_id)
+    new_id = games.create(req.params.game_id)
+
+    # redirect to generated game if a new id had to be used.
+    res.redirect '/connect/' + new_id if new_id != req.params.game_id
 
   res.render 'setup', locals:
                         game_id: req.params.game_id,

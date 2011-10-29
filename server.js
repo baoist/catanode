@@ -36,8 +36,12 @@
     return res.render('index');
   });
   app.get('/connect/:game_id', function(req, res) {
+    var new_id;
     if (!games.list[req.params.game_id]) {
-      games.create(req.params.game_id);
+      new_id = games.create(req.params.game_id);
+      if (new_id !== req.params.game_id) {
+        res.redirect('/connect/' + new_id);
+      }
     }
     return res.render('setup', {
       locals: {
