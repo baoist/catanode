@@ -24,14 +24,20 @@
       socket.rooms[game_port] = {};
       return res.redirect('/connect/' + game_port);
     } else {
-      return res.redirect('/error', {
+      return res.render('error', {
         locals: {
           reason: game_port
         }
       });
     }
   });
-  app.get('/error', function(req, res) {});
+  app.get('/error', function(req, res) {
+    return res.render('error', {
+      locals: {
+        reason: "An error has occurred."
+      }
+    });
+  });
   app.get('/connect', function(req, res) {
     return res.render('index');
   });
@@ -97,6 +103,10 @@
           });
         }
       }
+    });
+    client.on('leave_game', function(data) {
+      var room;
+      return room = data.game.port();
     });
     return client.on('game_message', function(data) {
       var room;

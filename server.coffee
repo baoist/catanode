@@ -1,11 +1,12 @@
+#require
 http = require 'http'
 _ = require 'underscore'
 backbone = require 'backbone'
-
 express = require 'express'
 app = express.createServer()
 socket = require('socket.io').listen(app)
 
+# set up app
 app.register '.jade', require 'jade'
 app.set 'view engine', 'jade'
 app.set 'view options', {
@@ -13,10 +14,11 @@ app.set 'view options', {
 }
 app.use express.static(__dirname + "/public/")
 
+# start 'games'
 games_server = require('./lib/games')
 games = new games_server.start(0, 9000)
-# games = require('./lib/games').start(0, 10000) # change to this
 
+# routes
 app.get '/', (req, res) ->
   res.render 'index'
 
@@ -26,10 +28,12 @@ app.get '/create', (req, res) ->
     socket.rooms[game_port] = {}
     res.redirect '/connect/' + game_port
   else
-    res.redirect '/error', locals:
+    res.render 'error', locals:
                            reason: game_port
 
 app.get '/error', (req, res) ->
+  res.render 'error', locals:
+                      reason: "An error has occurred."
 
 app.get '/connect', (req, res) ->
   res.render 'index'
@@ -46,12 +50,14 @@ app.get '/connect/:game_id', (req, res) ->
                         players: games.list[req.params.game_id].players,
                         url: req.headers.host + req.url
 
+# pulls port from a requesting url (the last character string)
 Array::last = ->
   return this[this.length-1]
 
-String::port = -> # pulls port from a requesting url (the last character string)
+String::port = ->
   return parseInt(this.split('/').last().split(/[^0-9]/)[0])
 
+# sockets
 socket.sockets.on 'connection', (client) ->
   client.on 'join_lobby', (data) -> # any user joins the main lobby
     client.join data.game.port()
@@ -74,11 +80,15 @@ socket.sockets.on 'connection', (client) ->
       if player
         socket.sockets.in(room).emit 'join_game', { action: 'has joined the game.', name: data.name, slot: slot, icon: player.icon }
 
+  client.on 'leave_game', (data) ->
+    room = data.game.port()
+
   client.on 'game_message', (data) ->
     room = data.game.port()
     if socket.rooms['/' + room].indexOf(client.id) > -1
       socket.sockets.in(room).emit 'message', { action: 'message', name: data.name, message: data.message }
 
+# server
 port = process.env.PORT || 8080
 app.listen port
 console.log 'Server listening on port: ' + port

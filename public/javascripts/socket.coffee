@@ -1,5 +1,54 @@
 socket = io.connect('http://localhost/') # change to server.
 
+class Lobby
+  constructor: (name, chat, players) ->
+    @url = document.URL
+    @name = name || undefined
+    @chat = chat || $('#chat form')
+    @players = players || $('.player')
+    @allowed = false
+  
+  join_chat: (name) ->
+    self = this
+
+    socket.emit 'join_chat', {
+      name: name,
+      game: self.url
+    }
+
+    @allowed = true
+
+  format_join_chat: ->
+    
+  add_message: (message, input) ->
+    self = this
+
+    socket.emit 'game_message', {
+      name: self.name,
+      message: message,
+      game: self.url
+    }
+
+    self.clear(input) if input
+
+  join_game: (name, slot) ->
+    self = this
+
+    socket.emit 'join_game', {
+      game: document.URL,
+      slot: $('.player').index($(this).parent()) + 1,
+      name: name
+    }
+
+  format_join_game: ->
+
+  leave_game: ->
+
+  format_leave_game: ->
+
+  clear: (input) -> # for inputs
+    $(input).val('')
+
 swap_chat = (name) ->
   form = $('#set_name')
   form
@@ -9,10 +58,29 @@ swap_chat = (name) ->
   $('input[type=text]').val('')
 
 jQuery(document).ready ->
-  self = @
-  self.username = 'Name'
+  lobby = new Lobby()
+
   socket.on 'connect', (data) ->
-    socket.emit 'join_lobby', { game: document.URL }
+    socket.emit 'join_lobby', { game: lobby.url }
+
+  $('#chat form').submit (e) ->
+    val = $(this).find('input[type=text]').val()
+    return false if !val
+
+    if !lobby.allowed
+      lobby.join_chat val
+      return false
+
+    lobby.add_message val, $(this).find('input[type=text]')
+
+    e.stopPropagation()
+    e.preventDefault()
+
+  $('a.join').click (e) ->
+    lobby.join_game(lobby.name || $(this.prev().val()), lobby.players.index($(this).parent()) + 1)
+
+    e.stopPropagation()
+    e.preventDefault()
 
   socket.on 'join_game', (data) ->
     slot = $($('.player')[data.slot-1])
@@ -26,22 +94,17 @@ jQuery(document).ready ->
     slot.append(icon)
 
   socket.on 'allowed_lobbyist', (data) ->
-    self.username = data.name
+    lobby.name = data.name
     swap_chat(data.name)
 
   socket.on 'not_allowed_lobbyist', (data) ->
     alert data.name + ' ' + data.message
-    
-  $('a.join').click (e) ->
-    socket.emit 'join_game', { game: document.URL, slot: $('.player').index($(this).parent()) + 1, name: $(this).prev().val() }
-
-    e.stopPropagation()
-    e.preventDefault()
   
   $('input[type!=submit]').focus ->
     $(this).val('')
 
   # chat
+  '''
   $('#chat form').submit ->
     if $(this).attr('id') == 'set_name'
       socket.emit 'join_chat', { name: $(this).find('input[type=text]').val(), game: document.URL }
@@ -51,6 +114,7 @@ jQuery(document).ready ->
         socket.emit 'game_message', { name: self.username || 'Name', message: message, game: document.URL }
         $(this).find('input[type=text]').val('')
     return false
+  '''
     
   socket.on 'message', (data) ->
     if data.action == 'join'
