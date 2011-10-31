@@ -71,7 +71,7 @@
       var lobbyist, room;
       room = data.game.port();
       if (socket.rooms['/' + room].indexOf(client.id) > -1) {
-        lobbyist = games.add_lobby(room, client.handshake.address, client.id, data.name);
+        lobbyist = games.add_lobby(room, client.handshake.address.address, client.id, data.name);
         if (lobbyist) {
           return client.emit('allowed', {
             name: lobbyist.name,
@@ -110,7 +110,7 @@
       var room;
       return room = data.game.port();
     });
-    return client.on('game_message', function(data) {
+    client.on('game_message', function(data) {
       var room;
       room = data.game.port();
       if (socket.rooms['/' + room].indexOf(client.id) > -1) {
@@ -120,6 +120,25 @@
           message: data.message
         });
       }
+    });
+    return client.on('disconnect', function(data) {
+      var name, room, rooms, _results;
+      rooms = client.manager.roomClients[client.id];
+      _results = [];
+      for (room in rooms) {
+        room = room.port();
+        name = games.in_lobby(room, client.id);
+        if (!room || !name) {
+          continue;
+        }
+        games.purge_lobby(room, name);
+        _results.push(socket.sockets["in"](room).emit('message', {
+          action: 'message',
+          name: name,
+          message: 'has left the server.'
+        }));
+      }
+      return _results;
     });
   });
   port = process.env.PORT || 8080;

@@ -19,8 +19,13 @@
       });
       return this.allowed = true;
     };
+    Lobby.prototype.disconnect_chat = function(name) {};
     Lobby.prototype.format_chat = function(name) {
-      this.chat_form.attr('id', 'message').prepend('<h2>' + name + '</h2>').find('input[type=submit]').val('Send');
+      this.chat_form.attr('id', 'message');
+      if (!this.chat_form.find('h2')) {
+        this.chat_form.prepend('<h2>' + name + '</h2>');
+      }
+      this.chat_form.find('input[type=submit]').val('Send');
       return this.chat_form.find('input[type=text]').val('');
     };
     Lobby.prototype.add_message = function(name, message) {
@@ -66,16 +71,17 @@
       });
     });
     $('#chat form').submit(function(e) {
-      var val;
-      val = $(this).find('input[type=text]');
-      if (!val.val()) {
+      var input;
+      input = $(this).find('input[type=text]');
+      if (!input.val()) {
         return false;
       }
       if (!lobby.allowed) {
-        lobby.join_chat(val.val());
+        lobby.join_chat(input.val());
         return false;
       }
-      val.val('');
+      lobby.add_message(lobby.name, input.val());
+      input.val('');
       e.stopPropagation();
       return e.preventDefault();
     });
@@ -103,17 +109,23 @@
       lobby.allowed = false;
       return alert(data.name + ' ' + data.message);
     });
-    $('input[type!=submit]').focus(function() {
-      return $(this).val('');
-    });
-    return socket.on('message', function(data) {
+    socket.on('message', function(data) {
       var message;
-      if (data.action === 'join') {
-        message = data.message;
-      } else {
-        message = data.name + ': ' + data.message;
+      switch (data.action) {
+        case "join":
+          message = data.message;
+          break;
+        default:
+          message = data.name + ': ' + data.message;
       }
-      return lobby.chat_display.append('<p>' + message + '</p>');
+      lobby.chat_display.append('<p>' + message + '</p>');
+      return lobby.chat_display.scrollTop(lobby.chat_display.prop('scrollHeight') - lobby.chat_display.height());
+    });
+    socket.on('disconnect', function(data) {
+      return lobby.add_message(data.name, data.message);
+    });
+    return $('input[type!=submit]').focus(function() {
+      return $(this).val('');
     });
   });
 }).call(this);

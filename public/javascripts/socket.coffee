@@ -19,11 +19,13 @@ class Lobby
 
     @allowed = true
 
+  disconnect_chat: (name) ->
+    
+
   format_chat: (name) ->
-    @chat_form
-      .attr('id', 'message')
-      .prepend('<h2>' + name + '</h2>')
-      .find('input[type=submit]').val('Send')
+    @chat_form.attr('id', 'message')
+    @chat_form.prepend('<h2>' + name + '</h2>') if !@chat_form.find('h2')
+    @chat_form.find('input[type=submit]').val('Send')
     @chat_form.find('input[type=text]').val('')
     
   add_message: (name, message) ->
@@ -68,14 +70,15 @@ jQuery(document).ready ->
     socket.emit 'join_lobby', { game: lobby.url }
 
   $('#chat form').submit (e) ->
-    val = $(this).find('input[type=text]')
-    return false if !val.val()
+    input = $(this).find('input[type=text]')
+    return false if !input.val()
 
     if !lobby.allowed
-      lobby.join_chat val.val()
+      lobby.join_chat input.val()
       return false
 
-    val.val('')
+    lobby.add_message(lobby.name, input.val())
+    input.val('')
 
     e.stopPropagation()
     e.preventDefault()
@@ -105,13 +108,16 @@ jQuery(document).ready ->
     lobby.allowed = false
     alert data.name + ' ' + data.message
   
-  $('input[type!=submit]').focus ->
-    $(this).val('')
-
   socket.on 'message', (data) ->
-    if data.action == 'join'
-      message = data.message
-    else
-      message = data.name + ': ' + data.message
+    switch data.action
+      when "join" then message = data.message
+      else message = data.name + ': ' + data.message
       
     lobby.chat_display.append('<p>' + message + '</p>')
+    lobby.chat_display.scrollTop(lobby.chat_display.prop('scrollHeight') - lobby.chat_display.height())
+
+  socket.on 'disconnect', (data) ->
+    lobby.add_message(data.name, data.message)
+
+  $('input[type!=submit]').focus ->
+    $(this).val('')

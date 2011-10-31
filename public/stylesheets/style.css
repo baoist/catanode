@@ -15,6 +15,7 @@
 
 #players .player {
   width: 23%;
+  min-height: 130px;
   margin: 0 1%;
   float: left;
 }

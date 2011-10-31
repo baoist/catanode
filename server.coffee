@@ -65,7 +65,7 @@ socket.sockets.on 'connection', (client) ->
   client.on 'join_chat', (data) -> # user connects via name input on lobby screen
     room = data.game.port()
     if socket.rooms['/' + room].indexOf(client.id) > -1
-      lobbyist = games.add_lobby room, client.handshake.address, client.id, data.name
+      lobbyist = games.add_lobby room, client.handshake.address.address, client.id, data.name
       if lobbyist
         client.emit 'allowed', { name: lobbyist.name, type: 'chat', message: 'has connected to the server.' }
         # socket.sockets.in(data.game.port()).emit 'message', { action: 'join'}
@@ -88,6 +88,16 @@ socket.sockets.on 'connection', (client) ->
     room = data.game.port()
     if socket.rooms['/' + room].indexOf(client.id) > -1
       socket.sockets.in(room).emit 'message', { action: 'message', name: data.name, message: data.message }
+
+  client.on 'disconnect', (data) ->
+    # get room client was in, confirm that it was the proper room, and remove them from that game lobby
+    rooms = client.manager.roomClients[client.id]
+    for room of rooms
+      room = room.port()
+      name = games.in_lobby(room, client.id)
+      continue if !room or !name
+      games.purge_lobby(room, name)
+      socket.sockets.in(room).emit 'message', { action: 'message', name: name, message: 'has left the server.' }
 
 # server
 port = process.env.PORT || 8080
