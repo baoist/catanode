@@ -67,10 +67,10 @@ socket.sockets.on 'connection', (client) ->
     if socket.rooms['/' + room].indexOf(client.id) > -1
       lobbyist = games.add_lobby room, client.handshake.address, client.id, data.name
       if lobbyist
-        socket.sockets.in(data.game.port()).emit 'message', { action: 'join', message: lobbyist.name + ' has connected to the server.'}
-        client.emit 'allowed_lobbyist', { name: lobbyist.name }
+        client.emit 'allowed', { name: lobbyist.name, type: 'chat', message: 'has connected to the server.' }
+        # socket.sockets.in(data.game.port()).emit 'message', { action: 'join'}
       else
-        client.emit 'not_allowed_lobbyist', { name: data.name, message: 'is already taken in this chat.' }
+        client.emit 'not_allowed', { name: data.name, message: 'is already taken in this chat.' }
 
   client.on 'join_game', (data) ->
     room = data.game.port()
@@ -78,7 +78,8 @@ socket.sockets.on 'connection', (client) ->
     if socket.rooms['/' + room].indexOf(client.id) > -1
       player = games.add_player room, data.slot, data.name
       if player
-        socket.sockets.in(room).emit 'join_game', { action: 'has joined the game.', name: data.name, slot: slot, icon: player.icon }
+        client.emit 'allowed', { name: player.name, type: 'game', message: 'has joined the game.' }
+        socket.sockets.in(room).emit 'join_game', { name: data.name, slot: slot, icon: player.icon }
 
   client.on 'leave_game', (data) ->
     room = data.game.port()

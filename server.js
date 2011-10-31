@@ -73,15 +73,13 @@
       if (socket.rooms['/' + room].indexOf(client.id) > -1) {
         lobbyist = games.add_lobby(room, client.handshake.address, client.id, data.name);
         if (lobbyist) {
-          socket.sockets["in"](data.game.port()).emit('message', {
-            action: 'join',
-            message: lobbyist.name + ' has connected to the server.'
-          });
-          return client.emit('allowed_lobbyist', {
-            name: lobbyist.name
+          return client.emit('allowed', {
+            name: lobbyist.name,
+            type: 'chat',
+            message: 'has connected to the server.'
           });
         } else {
-          return client.emit('not_allowed_lobbyist', {
+          return client.emit('not_allowed', {
             name: data.name,
             message: 'is already taken in this chat.'
           });
@@ -95,8 +93,12 @@
       if (socket.rooms['/' + room].indexOf(client.id) > -1) {
         player = games.add_player(room, data.slot, data.name);
         if (player) {
+          client.emit('allowed', {
+            name: player.name,
+            type: 'game',
+            message: 'has joined the game.'
+          });
           return socket.sockets["in"](room).emit('join_game', {
-            action: 'has joined the game.',
             name: data.name,
             slot: slot,
             icon: player.icon

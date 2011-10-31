@@ -1,11 +1,12 @@
 (function() {
-  var Lobby, socket, swap_chat;
+  var Lobby, socket;
   socket = io.connect('http://localhost/');
   Lobby = (function() {
     function Lobby(name, chat, players) {
       this.url = document.URL;
       this.name = name || void 0;
-      this.chat = chat || $('#chat form');
+      this.chat_display = chat || $('#chat #display');
+      this.chat_form = chat || $('#chat form');
       this.players = players || $('.player');
       this.allowed = false;
     }
@@ -18,29 +19,37 @@
       });
       return this.allowed = true;
     };
-    Lobby.prototype.format_join_chat = function() {};
-    Lobby.prototype.add_message = function(message, input) {
+    Lobby.prototype.format_chat = function(name) {
+      this.chat_form.attr('id', 'message').prepend('<h2>' + name + '</h2>').find('input[type=submit]').val('Send');
+      return this.chat_form.find('input[type=text]').val('');
+    };
+    Lobby.prototype.add_message = function(name, message) {
       var self;
       self = this;
-      socket.emit('game_message', {
-        name: self.name,
+      return socket.emit('game_message', {
+        name: name,
         message: message,
         game: self.url
       });
-      if (input) {
-        return self.clear(input);
-      }
     };
     Lobby.prototype.join_game = function(name, slot) {
       var self;
       self = this;
       return socket.emit('join_game', {
         game: document.URL,
-        slot: $('.player').index($(this).parent()) + 1,
+        slot: slot,
         name: name
       });
     };
-    Lobby.prototype.format_join_game = function() {};
+    Lobby.prototype.format_join_game = function(slot, name, icon) {
+      var i, n;
+      slot = $($('.player')[slot]);
+      n = $('<h2>' + name + '</h2>');
+      i = $('<img src=' + icon + ' />');
+      slot.children().remove();
+      slot.append(n);
+      return slot.append(i);
+    };
     Lobby.prototype.leave_game = function() {};
     Lobby.prototype.format_leave_game = function() {};
     Lobby.prototype.clear = function(input) {
@@ -48,13 +57,6 @@
     };
     return Lobby;
   })();
-  swap_chat = function(name) {
-    var form;
-    form = $('#set_name');
-    form.attr('id', 'message').prepend('<h2>' + name + '</h2>');
-    form.find('input[type=submit]').val('Send');
-    return $('input[type=text]').val('');
-  };
   jQuery(document).ready(function() {
     var lobby;
     lobby = new Lobby();
@@ -65,44 +67,45 @@
     });
     $('#chat form').submit(function(e) {
       var val;
-      val = $(this).find('input[type=text]').val();
-      if (!val) {
+      val = $(this).find('input[type=text]');
+      if (!val.val()) {
         return false;
       }
       if (!lobby.allowed) {
-        lobby.join_chat(val);
+        lobby.join_chat(val.val());
         return false;
       }
-      lobby.add_message(val, $(this).find('input[type=text]'));
+      val.val('');
       e.stopPropagation();
       return e.preventDefault();
     });
     $('a.join').click(function(e) {
-      lobby.join_game(lobby.name || $(this.prev().val()), lobby.players.index($(this).parent()) + 1);
+      lobby.join_game(lobby.name || $(this).prev().val(), lobby.players.index($(this).parent()) + 1);
       e.stopPropagation();
       return e.preventDefault();
     });
     socket.on('join_game', function(data) {
-      var icon, name, slot;
-      slot = $($('.player')[data.slot - 1]);
-      name = $('<h2>' + data.name + '</h2>');
-      icon = $('<img src=' + data.icon + ' />');
-      self.username = data.name;
-      slot.children().remove();
-      slot.append(name);
-      return slot.append(icon);
+      return lobby.format_join_game(data.slot - 1, data.name, data.icon);
     });
-    socket.on('allowed_lobbyist', function(data) {
+    socket.on('allowed', function(data) {
+      lobby.allowed = true;
       lobby.name = data.name;
-      return swap_chat(data.name);
+      lobby.format_chat(data.name);
+      lobby.add_message(data.name, data.message);
+      switch (data.type) {
+        case "chat":
+          return lobby.players.find('input').remove();
+        case "game":
+          return lobby.players.find('.join, input').remove();
+      }
     });
-    socket.on('not_allowed_lobbyist', function(data) {
+    socket.on('not_allowed', function(data) {
+      lobby.allowed = false;
       return alert(data.name + ' ' + data.message);
     });
     $('input[type!=submit]').focus(function() {
       return $(this).val('');
     });
-    '$(\'#chat form\').submit ->\n  if $(this).attr(\'id\') == \'set_name\'\n    socket.emit \'join_chat\', { name: $(this).find(\'input[type=text]\').val(), game: document.URL }\n  else if $(this).attr(\'id\') == \'message\'\n    message = $(this).find(\'input[type=text]\').val()\n    if message\n      socket.emit \'game_message\', { name: self.username || \'Name\', message: message, game: document.URL }\n      $(this).find(\'input[type=text]\').val(\'\')\n  return false';
     return socket.on('message', function(data) {
       var message;
       if (data.action === 'join') {
@@ -110,7 +113,7 @@
       } else {
         message = data.name + ': ' + data.message;
       }
-      return $('#chat #display').append('<p>' + message + '</p>');
+      return lobby.chat_display.append('<p>' + message + '</p>');
     });
   });
 }).call(this);
