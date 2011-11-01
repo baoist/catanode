@@ -1,11 +1,5 @@
 # TODO
 
-v.1: Set up a game lobby that allows people to create games, invite friends, chat in lobby.
-
-## Testing
-
-Need to start testing methods and routes. I really need to start doing this...
-
 ## Create Game
 
  * Set creator.
@@ -24,7 +18,6 @@ Page for when a user attempts to create a game when there is a limit
 
  * Consider how backbone will be organized.
  * Remember: structures, points, board, turns, reconnections, materials.
- * REBUILD SOCKET.COFFEE AS OO.
 
 # Complete
 
