@@ -19,12 +19,12 @@ rjs([
 
   // setup
   socket = socket.listen(app);
-  app.register('.jade', jade);
-  app.set('view engine', 'jade');
-  app.set('view options', {
-    layout: false
-  });
-  app.use(express.static(__dirname + "/public/"));
+  app.register('.jade', jade)
+    .set('view engine', 'jade')
+    .set('view options', {
+      layout: false
+    })
+    .use(express.static(__dirname + "/public/"));
 
   // routes
   app.get('/', function(req, res) {

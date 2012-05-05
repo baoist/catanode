@@ -13,6 +13,7 @@
     "express": "~2.5.9",
     "socket.io": "~0.9.6",
     "jade": "~0.26.0",
-    "gameserver": "0.0.1"
+    "gameserver": "0.0.1",
+    "requirejs": "~1.0.8"
   }
 }
