@@ -80,7 +80,6 @@ rjs([
     });
   });
   app.get('*', function(req, res) {
-    console.log( req.url );
     return res.render('error', {
       locals: {
         reason: null,
