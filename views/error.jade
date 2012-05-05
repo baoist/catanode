@@ -8,4 +8,12 @@ html(lang="en")
     script(type="text/javascript", src="/javascripts/socket.js")
   body
     div#wrapper
-      h2= reason
+      = !!reason
+      - if (!!reason)
+        h2= reason
+      - else
+        h2 404
+        - if (typeof(page) !== "undefined")
+          p The page&nbsp;
+            a( href="#{ page }" )= page
+            &nbsp;was not found

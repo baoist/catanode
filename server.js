@@ -41,12 +41,13 @@ rjs([
     return res.render('index');
   });
   app.get('/create', function(req, res) {
-    var game_port;
-    game_port = games.create();
+    var game_port = games.create();
+
     if (typeof game_port === 'number') {
       socket.rooms[game_port] = {};
       return res.redirect('/connect/' + game_port);
     } else {
+      // too many games created
       return res.render('error', {
         locals: {
           reason: game_port
@@ -78,6 +79,15 @@ rjs([
       }
     });
   });
+  app.get('*', function(req, res) {
+    console.log( req.url );
+    return res.render('error', {
+      locals: {
+        reason: null,
+        page: req.headers.host + req.url
+      }
+    });
+  })
 
   // sockets
   socket.sockets.on('connection', function(client) {
