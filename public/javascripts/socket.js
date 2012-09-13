@@ -1,3 +1,10 @@
+var Socket;
+
+Socket = (function() {
+  function Socket(data) {
+    this.connection = io.connect(data.url || 'http://localhost');
+  }
+}());
 (function() {
   var Lobby, socket;
   socket = io.connect('http://localhost/');

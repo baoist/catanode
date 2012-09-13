@@ -69,6 +69,8 @@ requirejs([
     });
   });
 
+  require("./lib/sockets")(app, socket, gameserver);
+
   app.listen(port);
   console.log( "Server running at port: " + port);
 });
