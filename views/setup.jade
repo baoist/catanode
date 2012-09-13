@@ -1,34 +1,30 @@
-!!! 5
-html(lang="en")
-  head
-    title Catan game setup
-    link(href="/stylesheets/style.css", media="screen", rel="stylesheet", type="text/css")
-    script(type="text/javascript", src="/javascripts/jquery.js")
-    script(type="text/javascript", src="/socket.io/socket.io.js")
-    script(type="text/javascript", src="/javascripts/socket.js")
-  body
-    #wrapper
-      h1 Game #
-        span= game_id
-        span &nbsp;is being set up.
-      #players
-        - each player in players
-          .player
-            - if(player.name)
-              h2= player.name
-              img(src='#{player.icon}')
-              p= player.status
-            - else
-              input(type='text', value='name', maxlength='25')
-              a.join(href='#') Join
-      #chat
-        #display
-        form#set_name
-          input(type="text", value="Your Name Here.")
-          input(type="submit", value="Join Chat")
-      #invite
-        - if(url)
-          hgroup
-            h4 To invite someone to this game, send them the link:
-            h5
-              a(href=url)= url
+extends layout
+
+block scripts
+  script(src='/jquery.js')
+  script(src='/pets.js')
+
+block content
+  h1 Game #
+    span= game_id
+  #players
+    - each player in players
+      .player
+        - if(player.name)
+          h2= player.name
+          img(src='#{player.icon}')
+          p= player.status
+        - else
+          input(type='text', value='name', maxlength='25')
+          a.join(href='#') Join
+  #chat
+    #display
+    form#set_name
+      input(type="text", value="Your Name Here.")
+      input(type="submit", value="Join Chat")
+  #invite
+    - if(url)
+      hgroup
+        h4 To invite someone to this game, send them the link:
+        h5
+          a(href=url)= url
