@@ -1,19 +1,6 @@
-!!! 5
-html(lang="en")
-  head
-    title Catan
-    link(href="/stylesheets/style.css", media="screen", rel="stylesheet", type="text/css")
-    script(type="text/javascript", src="/javascripts/jquery.js")
-    script(type="text/javascript", src="/socket.io/socket.io.js")
-    script(type="text/javascript", src="/javascripts/socket.js")
-  body
-    div#wrapper
-      = !!reason
-      - if (!!reason)
-        h2= reason
-      - else
-        h2 404
-        - if (typeof(page) !== "undefined")
-          p The page&nbsp;
-            a( href="#{ page }" )= page
-            &nbsp;was not found
+extends layout
+
+block content
+  - if (!!reason)
+    h2= status
+    p= reason

@@ -4,7 +4,12 @@ Socket = (function() {
   function Socket(data) {
     this.connection = io.connect(data.url || 'http://localhost');
   }
+
+  Socket.prototype.emit = function(indentity, data, callback) {
+  
+  }
 }());
+/*
 (function() {
   var Lobby, socket;
   socket = io.connect('http://localhost/');
@@ -136,3 +141,4 @@ Socket = (function() {
     });
   });
 }).call(this);
+*/

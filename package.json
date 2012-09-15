@@ -10,10 +10,13 @@
   "dependencies": {
     "underscore": "*",
     "backbone": "*",
-    "express": "*",
+    "express": "3.0",
     "socket.io": "*",
     "jade": "*",
-    "requirejs": "*"
+    "requirejs": "*",
+    "passport": "0.1.12",
+    "passport-local": "0.1.6",
+    "connect-flash": "0.1.0",
     "gameserver": "/Users/bolson/projects/gameserver/"
   }
 }

@@ -7,70 +7,46 @@ requirejs.config({
     nodeRequire: require
 });
 
+require('./lib/utility');
+
 requirejs([
   'http', 
   'underscore', 
   'backbone', 
-  'express', 
+  'express',
+  'connect-flash',
+  'passport',
+  'passport-local',
   'socket.io', 
   'jade',
   'gameserver',
-  'lib/utility'
-], function(http, _, backbone, express, socket, jade, gameserver) {
-  var app, port;
+  'util'
+], function(http, _, backbone, express, flash, passport, passport_local, socket, jade, gameserver, util) {
+  var app = express()
+    , server = http.createServer(app)
+    , io = socket.listen(server)
+    , port = process.env.PORT || 8080;
 
-  app = express.createServer();
-  port = process.env.PORT || 2323;
+  require('./auth')(passport_local, passport);
 
-  app.engine('html', jade.renderFile)
-    .set('view engine', 'jade')
-    .set('views', __dirname + '/views')
-    .use(express.static(__dirname + "/public/"));
-
-  socket = socket.listen(app);
-
-  app.get('/', function(req, res) {
-    return res.render('index');
+  app.configure(function() {
+    app.engine('html', jade.renderFile);
+    app.set('view engine', 'jade');
+    app.set('views', __dirname + '/views');
+    app.use(express.static(__dirname + "/public/"));
+    app.use(express.cookieParser('testcookieparser'));
+    app.use(express.session({ cookie: { maxAge: 60000 }}));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.logger());
+    app.use(flash());
+    app.use(app.router);
+    app.use(passport.initialize());
+    app.use(passport.session());
   });
+  require("./sockets")(app, io, gameserver, passport);
+  require("./routes")(app, io, gameserver, passport);
 
-  app.get('/create', function(req, res) {
-    // change this,
-    // default to test.
-    var game_port = gameserver.create();
-
-    if( typeof game_port === "number" ) {
-      socket.rooms[game_port] = {};
-
-      return res.redirect( '/connect/' + game_port );
-    } else {
-      return res.render('error', {
-        reason: "Too many games are going on."
-      });
-    }
-  });
-
-  app.get('/connect', function(req, res) {
-    return res.render('index');
-  });
-
-  app.get('/connect/:game_id', function(req, res) {
-    if( !gameserver.games[req.params.game_id] ) {
-      var new_id = gameserver.create(req.params.game_id);
-
-      if (new_id !== req.params.game_id) {
-        return res.redirect('/connect/' + new_id);
-      }
-    }
-
-    return res.render('setup', {
-      game_id: req.params.game_id,
-      players: gameserver.games[req.params.game_id].players,
-      url: req.headers.host + req.url
-    });
-  });
-
-  require("./lib/sockets")(app, socket, gameserver);
-
-  app.listen(port);
+  server.listen(port);
   console.log( "Server running at port: " + port);
 });
