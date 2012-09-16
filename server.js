@@ -39,10 +39,10 @@ requirejs([
     app.use(express.bodyParser());
     app.use(express.methodOverride());
     app.use(express.logger());
-    app.use(flash());
-    app.use(app.router);
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(flash());
+    app.use(app.router);
   });
   require("./sockets")(app, io, gameserver, passport);
   require("./routes")(app, io, gameserver, passport);
