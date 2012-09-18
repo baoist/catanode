@@ -17,17 +17,24 @@ requirejs([
   'connect-flash',
   'passport',
   'passport-local',
+  'mongodb'
   'socket.io', 
   'jade',
   'gameserver',
   'util'
-], function(http, _, backbone, express, flash, passport, passport_local, socket, jade, gameserver, util) {
+], function(http, _, backbone, express, flash, passport, passport_local, mongo, socket, jade, gameserver, util) {
   var app = express()
     , server = http.createServer(app)
     , io = socket.listen(server)
     , port = process.env.PORT || 8080;
 
-  require('./auth')(passport_local, passport);
+  var MongoServer = mongo.Server
+    , Db = mongo.db;
+
+  var mongo_server = new MongoServer('localhost', 27017, {auto_reconnect: true})
+    , db = new Db('catanode_users', server);
+
+  require('./auth')(passport_local, passport, db);
 
   app.configure(function() {
     app.engine('html', jade.renderFile);
