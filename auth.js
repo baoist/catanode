@@ -1,9 +1,4 @@
-var users = [
-    { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
-  , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
-];
-
-module.exports = function(passport_local, passport) {
+module.exports = function(app, passport_local, passport, db) {
   LocalStrategy = passport_local.Strategy;
 
   passport.serializeUser(function(user, done) {
@@ -11,7 +6,7 @@ module.exports = function(passport_local, passport) {
   });
 
   passport.deserializeUser(function(id, done) {
-    findById(id, function (err, user) {
+    app.users.findOne({ _id: id }, function (err, user) {
       done(err, user);
     });
   });
@@ -26,23 +21,4 @@ module.exports = function(passport_local, passport) {
       });
     }
   ));
-
-  function findById(id, fn) {
-    var idx = id - 1;
-    if (users[idx]) {
-      fn(null, users[idx]);
-    } else {
-      fn(new Error('User ' + id + ' does not exist'));
-    }
-  }
-
-  function findByUsername(username, fn) {
-    for (var i = 0, len = users.length; i < len; i++) {
-      var user = users[i];
-      if (user.username === username) {
-        return fn(null, user);
-      }
-    }
-    return fn(null, null);
-  }
 }

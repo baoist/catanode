@@ -39,7 +39,7 @@ requirejs([
   var db = new MongoDb('catanode-users', mongo_server).open(function( err, client ) {
     app.users = new mongo.Collection(client, 'users');
 
-    require('./auth')(passport_local, passport, db);
+    require('./auth')(app, passport_local, passport, db, app);
 
     app.configure(function() {
       app.engine('html', jade.renderFile);
@@ -60,7 +60,21 @@ requirejs([
     require("./sockets")(app, io, gameserver, passport);
     require("./routes")(app, io, gameserver, passport);
 
-    server.listen(port);
-    console.log( "Server running at port: " + port);
+    client.ensureIndex('users', 'email', function(err) {
+      if( err ) {
+        throw err;
+      }
+
+      client.ensureIndex('users', 'password', function(err) {
+        if( err ) {
+          throw err;
+        }
+
+        server.listen(port);
+
+        console.log( "Database live at: " + db_data.server + "/" + db_data.port);
+        console.log( "Server running at port: " + port);
+      });
+    });
   });
 });
