@@ -1,0 +1,25 @@
+extends layout
+
+block scripts
+  script(type="text/javascript", src="/socket.io/socket.io.js")
+  script(type="text/javascript", src="/javascripts/socket.js")
+
+block content
+  form(action='/join', method='post')
+    div
+      label Username:
+      input(type='text', name='user[username]')
+    div
+      label Email:
+      input(type='text', name='user[email]')
+    div
+      label Confirm Email:
+      input(type='text', name='user[confirm_email]')
+    div
+      label Password:
+      input(type='password', name='user[password]')
+    div
+      label Confirm Password:
+      input(type='password', name='user[confirm_password]')
+    div
+      input(type='submit', value='Log In')

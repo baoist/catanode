@@ -17,64 +17,59 @@ requirejs([
   'connect-flash',
   'passport',
   'passport-local',
-  'mongodb',
+  'connect-mongodb',
+  'mongoose',
   'socket.io', 
   'jade',
   'gameserver',
   'util'
-], function(http, _, backbone, express, flash, passport, passport_local, mongo, socket, jade, gameserver, util) {
+], function(http, _, backbone, express, flash, passport, passport_local, mongoStore, mongoose, socket, jade, gameserver, util) {
   var app = express()
     , server = http.createServer(app)
     , io = socket.listen(server)
     , port = process.env.PORT || 8080
     , db_data = {
-        server: process.env.DB_SERVER || '127.0.0.1',
-        port: process.env.DB_PORT || 27017
+        server: process.env.DB_SERVER || 'mongodb://localhost',
+        port: process.env.DB_PORT || 27017,
+        connection: function() {
+          return db_data.server + ":" + db_data.port;
+        }
       };
 
-  var MongoServer = mongo.Server
-    , MongoDb = mongo.Db;
+  var Db = require('./access-db');
 
-  var mongo_server = new MongoServer(db_data.server, db_data.port, {auto_reconnect: true});
-  var db = new MongoDb('catanode-users', mongo_server).open(function( err, client ) {
-    app.users = new mongo.Collection(client, 'users');
-
-    require('./auth')(app, passport_local, passport, db, app);
-
-    app.configure(function() {
-      app.engine('html', jade.renderFile);
-      app.set('view engine', 'jade');
-      app.set('views', __dirname + '/views');
-      app.use(express.static(__dirname + "/public/"));
-      app.use(express.cookieParser('testcookieparser'));
-      app.use(express.session({ cookie: { maxAge: 60000 }}));
-      app.use(express.bodyParser());
-      app.use(express.methodOverride());
-      app.use(express.logger());
-      app.use(passport.initialize());
-      app.use(passport.session());
-      app.use(flash());
+  app.configure(function() {
+    app.engine('html', jade.renderFile);
+    app.set('view engine', 'jade');
+    app.set('views', __dirname + '/views');
+    app.use(express.static(__dirname + "/public/"));
+    app.use(express.cookieParser('testcookieparser'));
+    app.use(express.session({ 
+      maxAge: 60000,
+      store: mongoStore( db_data.connection() ),
+      secret: 'applecake'
+    }, function() {
       app.use(app.router);
-    });
-
-    require("./sockets")(app, io, gameserver, passport);
-    require("./routes")(app, io, gameserver, passport);
-
-    client.ensureIndex('users', 'email', function(err) {
-      if( err ) {
-        throw err;
-      }
-
-      client.ensureIndex('users', 'password', function(err) {
-        if( err ) {
-          throw err;
-        }
-
-        server.listen(port);
-
-        console.log( "Database live at: " + db_data.server + "/" + db_data.port);
-        console.log( "Server running at port: " + port);
-      });
-    });
+    }));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.logger());
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(flash());
+    app.use(app.router);
   });
+
+  var db = new Db.startup( db_data.connection() + "/catanode-users" );
+  Db.getUsers(function(users) {
+    users.forEach(function( user ) {
+      // console.log( user.username );
+    });
+  })
+
+  require("./sockets")(app, io, gameserver, passport);
+  require("./routes")(app, io, gameserver, passport);
+  
+  console.log( "Database live at: " + db_data.connection() );
+  console.log( "Server running at port: " + port);
 });
