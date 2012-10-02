@@ -37,7 +37,9 @@ module.exports = {
     // Check connection to mongoDB
     mongoose.connection.on('open', function() {
       console.log('We have connected to mongodb');
-    }); 
+    });
+
+    return this;
   },
 
   saveUser: function(userInfo, callback) {
@@ -49,8 +51,11 @@ module.exports = {
     });
 
     newUser.save(function(err) {
-      if (err) {throw err;}
-      callback(null, userInfo);
+      if (err) { throw err; }
+
+      if( typeof callback !== "undefined" ) {
+        callback(null, userInfo);
+      }
     });
   },
 
