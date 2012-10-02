@@ -31,8 +31,8 @@ UserSchema.method('verifyPassword', function(password, callback) {
   bcrypt.compare(password, this.hash, callback);
 });
 
-UserSchema.static('authenticate', function(email, password, callback) {
-  this.findOne({ email: email }, function(err, user) {
+UserSchema.static('authenticate', function(username, password, callback) {
+  this.findOne({ username: username }, function(err, user) {
     if (err) { return callback(err); }
     if (!user) { return callback(null, false); }
     user.verifyPassword(password, function(err, passwordCorrect) {
