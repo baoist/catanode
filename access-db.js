@@ -43,20 +43,26 @@ module.exports = {
   },
 
   saveUser: function(userInfo, callback) {
-    var newUser = new User ({
-      name: { first: userInfo.fname, last: userInfo.lname },
-      username: userInfo.username,
-      email: userInfo.email,
-      password: userInfo.password
-    });
+    User.findOne({ username: userInfo.username }, function(err, user) {
+      if( !user ) {
+        console.log( "NICE!" );
 
-    newUser.save(function(err) {
-      if (err) { throw err; }
+        var newUser = new User ({
+          name: { first: userInfo.fname, last: userInfo.lname },
+          username: userInfo.username,
+          email: userInfo.email,
+          password: userInfo.password
+        });
 
-      if( typeof callback !== "undefined" ) {
-        callback(null, userInfo);
+        newUser.save(function(err) {
+          if (err) { throw err; }
+
+          if( typeof callback !== "undefined" ) {
+            callback(null, userInfo);
+          }
+        });
       }
-    });
+    })
   },
 
   getUsers: function(callback) {

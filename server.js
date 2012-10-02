@@ -61,12 +61,14 @@ requirejs([
   });
 
   var db = new Db.startup( db_data.connection() + "/catanode-users" );
+  /* TESTING create user
   Db.saveUser({
     fname: "b-rad", lname: "olson",
     email: "iam@brad.io",
-    username: "foobarbaz",
+    username: "frbsqasasdasdasdz",
     password: "wibblez"
-  })
+  });
+  */
   Db.getUsers(function(users) {
     users.forEach(function( user ) {
       console.log( user.username );
