@@ -19,7 +19,7 @@ var UserSchema = new Schema({
   hash: { type: String, required: true }
 });
 
-UserSchema.virtual('password').get(function () {
+UserSchema.virtual('password').get(function() {
   return this._password;
 }).set(function (password) {
   this._password = password;
@@ -35,6 +35,7 @@ UserSchema.static('authenticate', function(username, password, callback) {
   this.findOne({ username: username }, function(err, user) {
     if (err) { return callback(err); }
     if (!user) { return callback(null, false); }
+
     user.verifyPassword(password, function(err, passwordCorrect) {
       if (err) { return callback(err); }
       if (!passwordCorrect) { return callback(null, false); }
@@ -43,4 +44,4 @@ UserSchema.static('authenticate', function(username, password, callback) {
   });
 });
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model('User', UserSchema);

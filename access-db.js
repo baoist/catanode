@@ -8,6 +8,14 @@ var passport = require('passport')
 
 var User = require('./models/user');
 
+var db_data = {
+  server: process.env.DB_SERVER || 'mongodb://localhost',
+  port: process.env.DB_PORT || 27017,
+  connection: function() {
+    return this.server + ":" + this.port;
+  }
+}
+
 // Define local strategy for Passport
 passport.use(new LocalStrategy({
     usernameField: 'email'
@@ -42,11 +50,16 @@ module.exports = {
     return this;
   },
 
-  saveUser: function(userInfo, callback) {
-    User.findOne({ username: userInfo.username }, function(err, user) {
-      if( !user ) {
-        console.log( "NICE!" );
+  data: db_data,
 
+  saveUser: function(userInfo, callback) {
+    User.find().or([{ username: userInfo.username }, { email: userInfo.email }]).exec(function(err, users) {
+      console.log( userInfo.username );
+      console.log( userInfo.email );
+
+      console.log( users );
+
+      if( !users || users.length < 1 ) {
         var newUser = new User ({
           name: { first: userInfo.fname, last: userInfo.lname },
           username: userInfo.username,
@@ -61,8 +74,10 @@ module.exports = {
             callback(null, userInfo);
           }
         });
+      } else {
+        console.log( "Users exist where expected, given the username\"" + userInfo.username + "\" and the email \"" + userInfo.email + "\"" );
       }
-    })
+    });
   },
 
   getUsers: function(callback) {

@@ -27,14 +27,7 @@ requirejs([
   var app = express()
     , server = http.createServer(app)
     , io = socket.listen(server)
-    , port = process.env.PORT || 8080
-    , db_data = {
-        server: process.env.DB_SERVER || 'mongodb://localhost',
-        port: process.env.DB_PORT || 27017,
-        connection: function() {
-          return db_data.server + ":" + db_data.port;
-        }
-      };
+    , port = process.env.PORT || 8080;
 
   var Db = require('./access-db');
 
@@ -46,7 +39,7 @@ requirejs([
     app.use(express.cookieParser('testcookieparser'));
     app.use(express.session({ 
       maxAge: 60000,
-      store: mongoStore( db_data.connection() ),
+      store: mongoStore( Db.data.connection() ),
       secret: 'applecake'
     }, function() {
       app.use(app.router);
@@ -60,24 +53,11 @@ requirejs([
     app.use(app.router);
   });
 
-  var db = new Db.startup( db_data.connection() + "/catanode-users" );
-  /* TESTING create user
-  Db.saveUser({
-    fname: "b-rad", lname: "olson",
-    email: "iam@brad.io",
-    username: "frbsqasasdasdasdz",
-    password: "wibblez"
-  });
-  */
-  Db.getUsers(function(users) {
-    users.forEach(function( user ) {
-      console.log( user.username );
-    });
-  })
+  var db = new Db.startup( Db.data.connection() + "/catanode-users" );
 
   require("./sockets")(app, io, gameserver, passport);
   require("./routes")(app, io, gameserver, passport);
   
-  console.log( "Database live at: " + db_data.connection() );
+  console.log( "Database live at: " + Db.data.connection() );
   console.log( "Server running at port: " + port);
 });
