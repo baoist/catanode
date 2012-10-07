@@ -9,23 +9,23 @@ describe('Array', function(){
   })
 });
 
-
 describe('Connection', function() {
-  var Db = require('../access-db');
+  var Db = require('../access-db')
+    , db = new Db.startup( Db.data.connection() + "/catanode-users-test" );
 
-  describe("#create()", function() {
+  before(function() {
+    // clear db.
+  });
+
+  describe("#saveUser()", function() {
     it('should create a new user', function(done) {
-      var db = new Db.startup( Db.data.connection() + "/catanode-users-test" );
-
-      Db.getUsers(function(err, users) {
-        users.drop();
-      });
-
       Db.saveUser({
         fname: "b-rad", lname: "olson",
         email: "foo@brad.io",
         username: "bao!",
         password: "wibblez"
+      }, function(err, user) {
+        done();
       });
     });
   });

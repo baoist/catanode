@@ -54,11 +54,6 @@ module.exports = {
 
   saveUser: function(userInfo, callback) {
     User.find().or([{ username: userInfo.username }, { email: userInfo.email }]).exec(function(err, users) {
-      console.log( userInfo.username );
-      console.log( userInfo.email );
-
-      console.log( users );
-
       if( !users || users.length < 1 ) {
         var newUser = new User ({
           name: { first: userInfo.fname, last: userInfo.lname },
