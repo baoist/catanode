@@ -25,6 +25,7 @@ describe('Connection', function() {
         username: "bao!",
         password: "wibblez"
       }, function(err, user) {
+        if( err ) throw err;
         done();
       });
     });

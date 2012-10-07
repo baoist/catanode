@@ -70,7 +70,9 @@ module.exports = {
           }
         });
       } else {
-        console.log( "Users exist where expected, given the username\"" + userInfo.username + "\" and the email \"" + userInfo.email + "\"" );
+        if( typeof callback !== "undefined" ) {
+          callback("Users exist where expected, given the username\"" + userInfo.username + "\" and the email \"" + userInfo.email + "\"", null);
+        }
       }
     });
   },
