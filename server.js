@@ -55,9 +55,11 @@ requirejs([
 
   var db = new Db.startup( Db.data.connection() + "/catanode-users" );
 
-  require("./sockets")(app, io, gameserver, passport);
-  require("./routes")(app, io, gameserver, passport);
+  require("./sockets")(app, io, gameserver, passport, Db);
+  require("./routes")(app, io, gameserver, passport, Db);
   
+  server.listen(port);
+
   console.log( "Database live at: " + Db.data.connection() );
   console.log( "Server running at port: " + port);
 });

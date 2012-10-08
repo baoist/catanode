@@ -70,6 +70,21 @@ module.exports = function(app, io, gameserver, passport, db) {
     });
   });
 
+  app.get('/signup', function(req, res) {
+    console.log( db )
+    res.render('signup', { message: false });
+  });
+
+  app.post('/signup', function(req, res) {
+    db.saveUser(req.body.user, function(err, user) {
+      if( !err ) {
+        res.redirect('/');
+      } else {
+        res.render('signup', { message: err });
+      }
+    });
+  })
+
   app.get('/login', function(req, res){
     res.render('login', { user: req.user, message: req.flash('error') });
   });

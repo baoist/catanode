@@ -1,0 +1,27 @@
+extends layout
+
+block scripts
+  script(type="text/javascript", src="/socket.io/socket.io.js")
+  script(type="text/javascript", src="/javascripts/socket.js")
+
+block content
+  - if(message)
+    h1= message
+  form(action='/signup', method='post')
+    div
+      label First Name:
+      input(type='text', name='user[fname]')
+    div
+      label Last Name:
+      input(type='text', name='user[lname]')
+    div
+      label Email:
+      input(type='text', name='user[email]')
+    div
+      label Username:
+      input(type='text', name='user[username]')
+    div
+      label Password:
+      input(type='password', name='user[password]')
+    div
+      input(type='submit', value='Log In')
