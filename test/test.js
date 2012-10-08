@@ -1,20 +1,14 @@
 var assert = require("assert");
 
-describe('Array', function(){
-  describe('#indexOf()', function(){
-    it('should return -1 when the value is not present', function(){
-      assert.equal(-1, [1,2,3].indexOf(5));
-      assert.equal(-1, [1,2,3].indexOf(0));
-    })
-  })
-});
-
 describe('Connection', function() {
   var Db = require('../access-db')
     , db = new Db.startup( Db.data.connection() + "/catanode-users-test" );
 
   before(function() {
     // clear db.
+    Db.User.remove({}, function(err) { 
+       console.log('collection removed') 
+    });
   });
 
   describe("#saveUser()", function() {
@@ -27,6 +21,16 @@ describe('Connection', function() {
       }, function(err, user) {
         if( err ) throw err;
         done();
+      });
+    });
+  });
+
+  describe("#getUsers()", function() {
+    it('should return all users, with a length of 1', function(done) {
+      Db.getUsers(function(users) {
+        if( users.length > 0 ) {
+          done();
+        }
       });
     });
   });

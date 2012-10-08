@@ -52,6 +52,8 @@ module.exports = {
 
   data: db_data,
 
+  User: User,
+
   saveUser: function(userInfo, callback) {
     User.find().or([{ username: userInfo.username }, { email: userInfo.email }]).exec(function(err, users) {
       if( !users || users.length < 1 ) {
