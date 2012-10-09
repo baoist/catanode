@@ -18,9 +18,10 @@ var db_data = {
 
 // Define local strategy for Passport
 passport.use(new LocalStrategy({
-    usernameField: 'email'
-  }, function(email, password, done) {
-    User.authenticate(email, password, function(err, user) {
+    usernameField: 'user[username]',
+    passwordField: 'user[password]'
+  }, function(username, password, done) {
+    User.authenticate(username, password, function(err, user) {
       return done(err, user);
     });
   }

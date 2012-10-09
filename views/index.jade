@@ -4,5 +4,16 @@ block scripts
   script(src='/javascripts/test.js')
 
 block content
-  h2 Catanode! Home screen 
-    a(href="/create") Create Game
+  - if(user)
+    h1 Hello, 
+      = user.name.first
+      ,
+      = user.name.last
+    h2 Catanode! Home screen 
+      a(href="/create") Create Game
+  - else
+    h2 Please 
+      a(href="/login") log in 
+    or
+      a(href="/signup") sign up 
+    to create a game.
