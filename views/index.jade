@@ -11,17 +11,13 @@ block content
     h1 You will need to 
       a(href="/login") log in
       |  to create a game.
-      - if( gameserver.count() > 0 )
-        |  Alternatively, you can view one of the following games:
-        nav
-          each game, iter in gameserver.games
-            a(href="/game/#{game.id}")= game.id
-            - if( gameserver.count() !== iter ) 
+    - if( gameserver.count() > 0 )
+      p Alternatively, you can view one of the following games:
+      nav
+        - var gamecount = 0
+        each game, iter in gameserver.games
+          - gamecount++
+          a(href="/game/#{iter}")= iter
+          |  (#{gameserver.count(game.players) + game.lobby.length})
+          - if( gameserver.count() !== gamecount ) 
             | , 
-        foo
-      - else
-        | 
-        
-      
-  h2 Catanode! Home screen 
-    a(href="/create") Create Game

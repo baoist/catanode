@@ -85,4 +85,10 @@ module.exports = {
       callback(users);
     });
   },
+
+  userByUsername: function(identification, callback) {
+    User.findOne({username: identification}, function(err, user) {
+      callback(err, user);
+    })
+  }
 }

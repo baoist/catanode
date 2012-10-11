@@ -2,12 +2,6 @@ var util = require('util');
 
 module.exports = function(app, io, gameserver, passport, db) {
   app.get('/', function(req, res) {
-    console.log( gameserver.create() );
-    console.log( gameserver.create() );
-    console.log( gameserver.create() );
-    console.log( gameserver.create() );
-    console.log( gameserver.create() );
-
     return res.render('index', {
       user: req.user || null, 
       gameserver: gameserver
@@ -111,6 +105,21 @@ module.exports = function(app, io, gameserver, passport, db) {
     function(req, res) {
       res.redirect('/');
     });
+
+  app.get('/settings/:user', function(req, res) {
+    console.log( '-- all of the data --' );
+    if( req.user && req.user.username === req.params.user ) {
+      return res.render('user/settings', { user: req.user });
+    } else {
+      db.userByUsername(req.params.user, function(err, user) {
+        if( user ) {
+          return res.render('user/view', { user: req.user });
+        }
+
+        return res.render('user/error', { user: req.user });
+      });
+    }
+  })
 
   app.get('/logout', function(req, res) {
     req.logout();
