@@ -2,7 +2,16 @@ var util = require('util');
 
 module.exports = function(app, io, gameserver, passport, db) {
   app.get('/', function(req, res) {
-    return res.render('index', { user: req.user });
+    console.log( gameserver.create() );
+    console.log( gameserver.create() );
+    console.log( gameserver.create() );
+    console.log( gameserver.create() );
+    console.log( gameserver.create() );
+
+    return res.render('index', {
+      user: req.user || null, 
+      gameserver: gameserver
+    });
   });
 
   app.get('/create', function(req, res) {
@@ -76,18 +85,19 @@ module.exports = function(app, io, gameserver, passport, db) {
 
   app.post('/signup', function(req, res, next) {
     db.saveUser(req.body.user, function(err, user) {
-      if( !err ) {
+      if( err ) {
+        return res.render('signup', { message: err });
+      } else {
         passport.authenticate('local', function(err, user, info) {
-          console.log( err );
-          if (err) { return next(err) }
-          if (!user) { return res.redirect('/login') }
+          if (err) { return next(err); }
+          if (!user) { return res.redirect('/login'); }
+
           req.logIn(user, function(err) {
             if (err) { return next(err); }
+
             return res.redirect('/');
           });
         })(req, res, next);
-      } else {
-        return res.render('signup', { message: err });
       }
     });
   })
@@ -99,7 +109,6 @@ module.exports = function(app, io, gameserver, passport, db) {
   app.post('/login',
     passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
     function(req, res) {
-      console.log( req.user );
       res.redirect('/');
     });
 

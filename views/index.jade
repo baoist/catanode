@@ -4,13 +4,24 @@ block scripts
   script(src='/javascripts/test.js')
 
 block content
-  - if(user)
-    h1 Hello, #{user.name.first}.
-    h2 Catanode! Home screen 
+  - if( user )
+    h1
       a(href="/create") Create Game
   - else
-    h2 Please 
+    h1 You will need to 
       a(href="/login") log in
-      |  or 
-      a(href="/signup") sign up
       |  to create a game.
+      - if( gameserver.count() > 0 )
+        |  Alternatively, you can view one of the following games:
+        nav
+          each game, iter in gameserver.games
+            a(href="/game/#{game.id}")= game.id
+            - if( gameserver.count() !== iter ) 
+            | , 
+        foo
+      - else
+        | 
+        
+      
+  h2 Catanode! Home screen 
+    a(href="/create") Create Game

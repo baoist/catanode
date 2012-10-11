@@ -7,5 +7,16 @@ html(lang="en")
     script(type="text/javascript", src="/socket.io/socket.io.js")
     block scripts
   body
-    div#wrapper
-      block content
+    header
+      nav
+        - if( user )
+          a.tooltip.settings(href="/settings/#{user.username}")= user.name.first
+          a.signout(href="/signout") sign out
+        - else
+          a(href="/login") log in
+          a(href="/signup") sign up
+    div.wrapper
+      section.content
+        block content
+    footer
+      p This was created in 2011, and will hopefully launch in 2012.
