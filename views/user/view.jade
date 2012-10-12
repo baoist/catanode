@@ -1,0 +1,7 @@
+extends ../layout
+
+block content
+  h2 Information for #{searched.username}:
+  ul
+    li Name: #{searched.name.first} #{searched.name.last}
+    li Email: #{searched.email}

@@ -1,0 +1,7 @@
+extends ../layout
+
+block content
+  h2 Information for #{user.username} (that's you!):
+  ul
+    li Name: #{user.name.first} #{user.name.last}
+    li Email: #{user.email}

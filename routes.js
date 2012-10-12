@@ -113,10 +113,16 @@ module.exports = function(app, io, gameserver, passport, db) {
     } else {
       db.userByUsername(req.params.user, function(err, user) {
         if( user ) {
-          return res.render('user/view', { user: req.user });
+          return res.render('user/view', { 
+            user: false,
+            searched: user
+          });
         }
 
-        return res.render('user/error', { user: req.user });
+        return res.render('user/error', { 
+          user: false, 
+          error: "The user \"" + req.params.user + "\" doesn't exist."
+        });
       });
     }
   })
