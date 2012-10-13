@@ -42,37 +42,6 @@ module.exports = function(app, io, gameserver, passport, db) {
     });
   });
 
-  app.get('/join', function(req, res) {
-    return res.render('join');
-  });
-
-  app.post('/join', function(req, res, next) {
-    var errs = []; 
-
-    /*
-    switch(true) {
-      // error handling, fix callback issue thing stuff do.
-      case !!app.users.findOne({ username: req.body.user.username }):
-        app.users.findOne({'username': 'asd'}, function(err, user) {
-          if( !user ) {
-            errs.push("Username already exists");
-          }
-        });
-        break;
-    }
-    */
-
-    console.log(errs);
-
-    app.users.insert(req.body.user, function(err, doc) {
-      if( err ) {
-        return next(err);
-      }
-
-      res.redirect('/');
-    });
-  });
-
   app.get('/signup', function(req, res) {
     res.render('signup', { message: false });
   });
