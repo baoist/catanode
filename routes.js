@@ -9,12 +9,12 @@ module.exports = function(app, io, gameserver, passport, db) {
   });
 
   app.get('/create', function(req, res) {
-    var game_port = gameserver.create();
+    var game_id = gameserver.create();
 
-    if( typeof game_port === "number" ) {
-      socket.rooms[game_port] = {};
+    if( typeof game_id === "number" ) {
+      io.rooms[game_id] = { owner: req.user.username, users: [] };
 
-      return res.redirect( '/connect/' + game_port );
+      return res.redirect( '/connect/' + game_id );
     } else {
       return res.render('error', {
         reason: "Too many games are going on."
@@ -35,7 +35,21 @@ module.exports = function(app, io, gameserver, passport, db) {
       }
     }
 
+    console.log( 'user' )
+    console.log( req.user );
+    console.log( 'end user' )
+
+    if( req.user && io.rooms[req.params.game_id].users.indexOf( req.user.username ) < 0 ) {
+      console.log( 'io rooms' )
+      console.log( io.rooms[req.params.game_id] );
+      console.log( 'end io rooms' )
+
+      io.rooms[req.params.game_id].users.push( req.user.username );
+      io.sockets.emit("game_view", { game: req.params.game_id, user: req.user.username });
+    }
+
     return res.render('setup', {
+      user: req.user || false,
       game_id: req.params.game_id,
       players: gameserver.games[req.params.game_id].players,
       url: req.headers.host + req.url
@@ -115,6 +129,6 @@ module.exports = function(app, io, gameserver, passport, db) {
     if (req.isAuthenticated()) { 
       return next(); 
     }
-    res.redirect('/login')
+    res.redirect('/login');
   }
 }
