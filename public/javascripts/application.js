@@ -1,12 +1,10 @@
-var socket = new Socket();
+if( typeof socket === "undefined" ) {
+  var socket = new Socket();
+}
 
 jQuery(document).ready(function() {
 
   // sockets
-
-  socket.connection.on("game_view", function(data ) {
-    console.log( data );
-  });
 
   socket.receive("game_view", function(foo) {
     console.log( foo );

@@ -39,6 +39,8 @@ module.exports = function(app, io, gameserver, passport, db) {
 
     if( req.user && io.client ) {
       io.client.join( req.params.game_id );
+
+      // emit a user has joined 'game_view'
       io.client.in( '/' + req.params.game_id ).emit("game_view", { game: req.params.game_id, user: req.user.username });
     }
 

@@ -7,6 +7,17 @@
 //
 
 module.exports = function(app, io, gameserver, passport, socket) {
+  io.set('authorization', function(data, accept) {
+    /*
+    console.log( 'start data' );
+    console.log( data );
+    console.log( 'start data' );
+    console.log( 'start accept' );
+    console.log( accept );
+    console.log( 'start accept' );
+    */
+  });
+
   io.sockets.on('connection', function(client) {
     io.client = client;
 
@@ -25,9 +36,8 @@ module.exports = function(app, io, gameserver, passport, socket) {
     });
 
     client.on('game_message', function(data) {
-      console.log( '-- start game_message -- ' );
-      console.log( data );
-      console.log( '-- end game_message -- ' );
+      console.log( app );
+      console.log( client.handshake );
     })
   });
 }

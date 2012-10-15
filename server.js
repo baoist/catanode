@@ -40,7 +40,7 @@ requirejs([
     app.use(express.session({ 
       maxAge: 60000,
       store: mongoStore( Db.data.connection() ),
-      secret: 'applecake'
+      secret: 'catanodetesting'
     }, function() {
       app.use(app.router);
     }));
@@ -54,6 +54,8 @@ requirejs([
   });
 
   var db = new Db.startup( Db.data.connection() + "/catanode-users" );
+
+  console.log( express.session );
 
   require("./sockets")(app, io, gameserver, passport, Db);
   require("./routes")(app, io, gameserver, passport, Db);

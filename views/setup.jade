@@ -1,7 +1,12 @@
 extends globals/layout
 
 block scripts
+  script(type="text/javascript", src="/javascripts/chatlog.js")
 
 block content
-  h1
-    hi
+  if( user )
+    #chat
+      #display
+      form#message
+        input(type="text", placeholder="Type to chatroom...")
+        input(type="submit", value="Send")
