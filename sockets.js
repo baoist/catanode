@@ -8,14 +8,13 @@
 
 module.exports = function(app, io, gameserver, passport, socket) {
   io.sockets.on('connection', function(client) {
+    io.client = client;
 
     // Lobby / Games
 
     client.on('game_view', function(data) {
-      console.log( '-- start game_view -- ' );
-      console.log( data );
-      console.log( '-- end game_view -- ' );
-      return { foo: "Bar", baz: "wibble" };
+      console.log( io.sockets );
+      io.sockets.in( '/' + data.port ).emit("game_view", data);
     });
 
     client.on('game_occupy', function(data) {

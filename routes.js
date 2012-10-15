@@ -12,8 +12,6 @@ module.exports = function(app, io, gameserver, passport, db) {
     var game_id = gameserver.create();
 
     if( typeof game_id === "number" ) {
-      io.rooms[game_id] = { owner: req.user.username, users: [] };
-
       return res.redirect( '/connect/' + game_id );
     } else {
       return res.render('error', {
@@ -39,13 +37,9 @@ module.exports = function(app, io, gameserver, passport, db) {
     console.log( req.user );
     console.log( 'end user' )
 
-    if( req.user && io.rooms[req.params.game_id].users.indexOf( req.user.username ) < 0 ) {
-      console.log( 'io rooms' )
-      console.log( io.rooms[req.params.game_id] );
-      console.log( 'end io rooms' )
-
-      io.rooms[req.params.game_id].users.push( req.user.username );
-      io.sockets.emit("game_view", { game: req.params.game_id, user: req.user.username });
+    if( req.user && io.client ) {
+      io.client.join( req.params.game_id );
+      io.client.in( '/' + req.params.game_id ).emit("game_view", { game: req.params.game_id, user: req.user.username });
     }
 
     return res.render('setup', {

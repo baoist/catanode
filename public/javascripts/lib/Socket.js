@@ -21,8 +21,8 @@ Socket = (function() {
     throw "io doesn't exist.";
   }
 
-  Socket.prototype.send = function( name, data ) {
-    if( typeof name === undefined ) {
+  Socket.prototype.send = function( type, data ) {
+    if( typeof type === undefined ) {
       return;
     }
 
@@ -36,9 +36,9 @@ Socket = (function() {
       return;
     }
 
-    return this.receivers[type] = action;
+    this.receivers[type] = action;
 
-    this.connection.on(type, this.receivers[type]);
+    return this.connection.on(type, this.receivers[type]);
   }
 
   return Socket;
