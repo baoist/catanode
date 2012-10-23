@@ -33,10 +33,6 @@ module.exports = function(app, io, gameserver, passport, db) {
       }
     }
 
-    console.log( 'user' )
-    console.log( req.user );
-    console.log( 'end user' )
-
     if( req.user && io.client ) {
       io.client.join( req.params.game_id );
 
@@ -73,7 +69,7 @@ module.exports = function(app, io, gameserver, passport, db) {
         })(req, res, next);
       }
     });
-  })
+  });
 
   app.get('/login', function(req, res){
     return res.render('login', { user: req.user, message: req.flash('error') });
@@ -86,7 +82,6 @@ module.exports = function(app, io, gameserver, passport, db) {
     });
 
   app.get('/settings/:user', function(req, res) {
-    console.log( '-- all of the data --' );
     if( req.user && req.user.username === req.params.user ) {
       return res.render('user/settings', { user: req.user });
     } else {
@@ -104,7 +99,7 @@ module.exports = function(app, io, gameserver, passport, db) {
         });
       });
     }
-  })
+  });
 
   app.get('/logout', function(req, res) {
     req.logout();
@@ -114,7 +109,9 @@ module.exports = function(app, io, gameserver, passport, db) {
   app.get('*', function(req, res) {
     res.status(404);
 
+    // user or false
     return res.render('error', {
+      user: false,
       status: res.statusCode,
       reason: "The page you requested was not found.",
       page: req.headers.host + req.url

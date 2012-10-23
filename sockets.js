@@ -6,20 +6,23 @@
 //  user types in chat
 //
 
-module.exports = function(app, io, gameserver, passport, socket) {
-  io.set('authorization', function(data, accept) {
-    /*
-    console.log( 'start data' );
-    console.log( data );
-    console.log( 'start data' );
-    console.log( 'start accept' );
-    console.log( accept );
-    console.log( 'start accept' );
-    */
-  });
+var socketPassportBridge = require('passport.socketio')
+  , mongoose = require('mongoose');
+
+module.exports = function(express, app, io, gameserver, passport, socket) {
+  /*
+  io.set('authorization', socketPassportBridge.authorize({
+    sessionKey:    'testcookieparser',
+    sessionStore:  mongoose,
+    sessionSecret: "catanodetesting"
+  }));
+  */
 
   io.sockets.on('connection', function(client) {
     io.client = client;
+
+    console.log('foo')
+    console.log( client );
 
     // Lobby / Games
 
@@ -36,6 +39,7 @@ module.exports = function(app, io, gameserver, passport, socket) {
     });
 
     client.on('game_message', function(data) {
+      console.log( data );
       console.log( app );
       console.log( client.handshake );
     })

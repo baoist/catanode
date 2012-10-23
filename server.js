@@ -18,18 +18,18 @@ requirejs([
   'passport',
   'passport-local',
   'connect-mongodb',
-  'mongoose',
   'socket.io', 
   'jade',
   'gameserver',
   'util'
-], function(http, _, backbone, express, flash, passport, passport_local, mongoStore, mongoose, socket, jade, gameserver, util) {
+], function(http, _, backbone, express, flash, passport, passport_local, mongoStore, socket, jade, gameserver, util) {
   var app = express()
     , server = http.createServer(app)
     , io = socket.listen(server)
     , port = process.env.PORT || 8080;
 
-  var Db = require('./access-db');
+  var Db = require('./access-db')
+    , db = new Db.startup( "catanode-users" );
 
   app.configure(function() {
     app.engine('html', jade.renderFile);
@@ -38,8 +38,12 @@ requirejs([
     app.use(express.static(__dirname + "/public/"));
     app.use(express.cookieParser('testcookieparser'));
     app.use(express.session({ 
-      maxAge: 60000,
-      store: mongoStore( Db.data.connection() ),
+      maxAge: new Date(Date.now() + 3600000),
+      store: mongoStore({ db: db }, function(err){
+        console.log( '-- mongo connection start --' );
+        console.log( err || 'connect-mongodb setup ok' );
+        console.log( '-- mongo connection end --' );
+      }),
       secret: 'catanodetesting'
     }, function() {
       app.use(app.router);
@@ -53,15 +57,11 @@ requirejs([
     app.use(app.router);
   });
 
-  var db = new Db.startup( Db.data.connection() + "/catanode-users" );
-
-  console.log( express.session );
-
-  require("./sockets")(app, io, gameserver, passport, Db);
+  require("./sockets")(express, app, io, gameserver, passport, Db);
   require("./routes")(app, io, gameserver, passport, Db);
   
   server.listen(port);
 
-  console.log( "Database live at: " + Db.data.connection() );
+  console.log( "Database live at: " + Db.data.connection );
   console.log( "Server running at port: " + port);
 });
