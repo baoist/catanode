@@ -1,8 +1,6 @@
 // Module dependencies
 var mongoose = require('mongoose')
-  , Db = require('mongodb').Db
-  , Server = require('mongodb').Server
-  , Schema = mongoose.schema;
+  , Schema = mongoose.Schema;
 
 // dependencies for authentication
 var passport = require('passport')
@@ -11,24 +9,10 @@ var passport = require('passport')
 var User = require('./models/user');
 
 var db_data = {
-  server: process.env.DB_SERVER || 'http://localhost',
-  Server: null,
+  server: process.env.DB_SERVER || 'mongodb://localhost',
   port: process.env.DB_PORT || 27017,
-  config: function() {
-    if( !this.Server ) {
-      this.Server = new Server(this.server, this.port, {auto_reconnect: true, native_parser: true});
-    }
-    return this.Server;
-  },
-  connection: null,
-  connect: function( dbName ) {
-    if( this.connection ) {
-      return this.connection;
-    }
-
-    this.connection = new Db( dbName, this.config() );
-
-    return this.connect();
+  connection: function() {
+    return this.server + ":" + this.port;
   }
 }
 
@@ -58,13 +42,14 @@ passport.deserializeUser(function(id, done) {
 module.exports = {
   // initialize DB
   startup: function(dbToUse) {
-    var db = db_data.connect( dbToUse );
-    db.open(function(err, db) {
-      if( !err ) {
-        console.log("We are connected.");
-      } else {
-        console.log("Issue connecting to database.");
+    var db = mongoose.createConnection(dbToUse);
+    mongoose.connect(dbToUse, function( err ) {
+      if( err ) {
+        console.log( err );
       }
+    });
+    mongoose.connection.on('open', function() {
+      console.log('We have connected to mongodb');
     });
 
     return db;
@@ -77,7 +62,7 @@ module.exports = {
   saveUser: function(userInfo, callback) {
     User.find().or([{ username: userInfo.username }, { email: userInfo.email }]).exec(function(err, users) {
       if( !users || users.length < 1 ) {
-        var newUser = new User({
+        var newUser = new User ({
           name: { first: userInfo.fname, last: userInfo.lname },
           username: userInfo.username,
           email: userInfo.email,
