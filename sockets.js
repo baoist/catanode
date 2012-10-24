@@ -6,13 +6,13 @@
 //  user types in chat
 //
 
-module.exports = function(express, app, io, gameserver, passport, socket, store) {
-  var socketPassportBridge = require('passport.socketio')
-    , MongooseStore = require('connect-mongoose')(express);
+var socketPassportBridge = require('passport.socketio')
+  , MongooseStore = require('connect-mongoose');
 
+module.exports = function(express, app, io, gameserver, passport, socket, store) {
   io.set('authorization', socketPassportBridge.authorize({
-    sessionKey:    'testcookieparser',
-    sessionStore:  new MongooseStore,
+    sessionKey:    'connect.sid',
+    sessionStore:  store,
     sessionSecret: "catanodetesting"
   }));
 
