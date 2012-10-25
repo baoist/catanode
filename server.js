@@ -29,8 +29,8 @@ requirejs([
     , MongooseStore = require('connect-mongoose')(express);
 
   var Db = require('./access-db')
-    , db = new Db.startup( Db.data.connection() + "/catanode-users" )
-    , Store = new MongooseStore;
+    , db = new Db.startup( "catanode-users" )
+    , SessionStore = new MongooseStore;
 
   app.configure(function() {
     app.engine('html', jade.renderFile);
@@ -40,7 +40,7 @@ requirejs([
     app.use(express.cookieParser('testcookieparser'));
     app.use(express.session({ 
       maxAge: new Date(Date.now() + 3600000),
-      store: Store,
+      store: SessionStore,
       secret: 'catanodetesting'
     }, function() {
       app.use(app.router);
@@ -54,7 +54,9 @@ requirejs([
     app.use(app.router);
   });
 
-  require("./sockets")(express, app, io, gameserver, passport, Db, Store);
+  passport.socket = require('passport.socketio');
+
+  require("./sockets")(express, app, io, passport, Db, SessionStore);
   require("./routes")(app, io, gameserver, passport, Db);
   
   server.listen(port);

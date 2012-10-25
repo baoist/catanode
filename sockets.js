@@ -6,11 +6,8 @@
 //  user types in chat
 //
 
-var socketPassportBridge = require('passport.socketio')
-  , MongooseStore = require('connect-mongoose');
-
-module.exports = function(express, app, io, gameserver, passport, socket, store) {
-  io.set('authorization', socketPassportBridge.authorize({
+module.exports = function(express, app, io, passport, db, store) {
+  io.set('authorization', passport.socket.authorize({
     sessionKey:    'connect.sid',
     sessionStore:  store,
     sessionSecret: "catanodetesting"
@@ -18,9 +15,6 @@ module.exports = function(express, app, io, gameserver, passport, socket, store)
 
   io.sockets.on('connection', function(client) {
     io.client = client;
-
-    console.log('foo')
-    console.log( client );
 
     // Lobby / Games
 
@@ -37,9 +31,9 @@ module.exports = function(express, app, io, gameserver, passport, socket, store)
     });
 
     client.on('game_message', function(data) {
+      console.log( 'game message received' )
       console.log( data );
-      console.log( app );
-      console.log( client.handshake );
+      // console.log( client.handshake.user.username );
     })
   });
 }
