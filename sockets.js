@@ -10,12 +10,17 @@ module.exports = function(express, app, io, passport, db, store) {
   io.set('authorization', passport.socket.authorize({
     sessionKey:    'connect.sid',
     sessionStore:  store,
-    sessionSecret: "catanodetesting"
+    sessionSecret: "catanodetesting",
+    fail: function(test, accept) {
+      accept(null, false);
+    },
+    success: function(test, accept) {
+      accept(null, true);
+    }
   }));
 
   io.sockets.on('connection', function(client) {
     io.client = client;
-
     // Lobby / Games
 
     client.on('game_view', function(data) {

@@ -54,7 +54,7 @@ requirejs([
     app.use(app.router);
   });
 
-  passport.socket = require('passport.socketio');
+  passport.socket = require('./lib/passport_socket');
 
   require("./sockets")(express, app, io, passport, Db, SessionStore);
   require("./routes")(app, io, gameserver, passport, Db);
