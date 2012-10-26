@@ -11,16 +11,18 @@ module.exports = function(express, app, io, passport, db, store) {
     sessionKey:    'connect.sid',
     sessionStore:  store,
     sessionSecret: "catanodetesting",
-    fail: function(test, accept) {
-      accept(null, false);
+    fail: function(data, accept) {
+      accept(null, true);
     },
-    success: function(test, accept) {
+    success: function(data, accept) {
       accept(null, true);
     }
   }));
 
   io.sockets.on('connection', function(client) {
-    io.client = client;
+    client.authenticated = function() {
+      return (client.handshake.user && client.handshake.user.username);
+    };
     // Lobby / Games
 
     client.on('game_view', function(data) {
@@ -37,8 +39,13 @@ module.exports = function(express, app, io, passport, db, store) {
 
     client.on('game_message', function(data) {
       console.log( 'game message received' )
+      console.log( client.handshake );
       console.log( data );
-      // console.log( client.handshake.user.username );
-    })
+      if( client.authenticated() ) {
+        console.log( 'You\'re logged in!' );
+      }
+    });
+
+    io.client = client;
   });
 }

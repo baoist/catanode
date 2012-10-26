@@ -4,9 +4,13 @@ block scripts
   script(type="text/javascript", src="/javascripts/chatlog.js")
 
 block content
-  if( user )
-    #chat
-      #display
+  #chat
+    #display
+    if( user )
       form#message
         input(type="text", placeholder="Type to chatroom...")
         input(type="submit", value="Send")
+    else
+      p You will need to 
+        a(href="/login") log in 
+        | to type here.

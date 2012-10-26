@@ -72,13 +72,19 @@ module.exports = function(app, io, gameserver, passport, db) {
   });
 
   app.get('/login', function(req, res){
+    req.session.referrerURL = req.headers.referer || "/";
     return res.render('login', { user: req.user, message: req.flash('error') });
   });
 
   app.post('/login',
     passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
     function(req, res) {
-      res.redirect('/');
+      var redirectTo = "/";
+      if( req.session && req.session.referrerURL ) {
+        redirectTo = req.session.referrerURL;
+      }
+
+      res.redirect( redirectTo );
     });
 
   app.get('/settings/:user', function(req, res) {

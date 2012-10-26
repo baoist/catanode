@@ -11,13 +11,14 @@ var User = require('./models/user');
 var db_data = {
   server: process.env.DB_SERVER || 'mongodb://localhost',
   port: process.env.DB_PORT || 27017,
+  db: null,
   connection: function( dbToUse ) {
     var db = "";
     if( typeof dbToUse !== "undefined" ) {
       db = "/" + dbToUse;
     }
 
-    return this.server + ":" + this.port + db;
+    return this.db = this.server + ":" + this.port + db;
   }
 }
 
@@ -45,9 +46,10 @@ passport.deserializeUser(function(id, done) {
 });
 
 module.exports = {
-  // initialize DB
+  data: db_data,
+
   startup: function(dbToUse) {
-    mongoose.connect(db_data.connection( dbToUse ), function( err ) {
+    mongoose.connect(db_data.db || db_data.connection( dbToUse ), function( err ) {
       if( err ) {
         console.log( err );
       }
@@ -58,8 +60,6 @@ module.exports = {
 
     return this;
   },
-
-  data: db_data,
 
   User: User,
 
