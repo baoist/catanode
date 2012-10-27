@@ -1,5 +1,4 @@
 jQuery(document).ready(function() {
-
   var log = {
     elements: {
       container: $('#chat'),
@@ -15,8 +14,7 @@ jQuery(document).ready(function() {
   log.elements.form.submit(function(e) {
     e.preventDefault();
 
-    socket.send('game_message', { message: $(this).find('input').first().text() });
-    console.log( 'sending' );
+    socket.send('game_message', { message: $(this).find('input').first().val() });
 
     return;
   });

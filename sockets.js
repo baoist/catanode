@@ -23,7 +23,21 @@ module.exports = function(express, app, io, passport, db, store) {
     client.authenticated = function() {
       return (client.handshake.user && client.handshake.user.username);
     };
+
+    client.getUser = function() {
+      return client.handshake.user;
+    }
+
+    client.emissions = {};
+
     // Lobby / Games
+    client.emissions.message = function( data ) {
+      // takes data.name data.message, data.game as params to emit to games.
+      io.client.in('/' + data.game ).emit('game_message', {
+        from: data.name || "God",
+        message: data.message
+      });
+    }
 
     client.on('game_view', function(data) {
       console.log( io.sockets );
@@ -38,11 +52,21 @@ module.exports = function(express, app, io, passport, db, store) {
     });
 
     client.on('game_message', function(data) {
+      // receive game message
+      // game id (?)
+      // message
       console.log( 'game message received' )
       console.log( client.handshake );
       console.log( data );
       if( client.authenticated() ) {
         console.log( 'You\'re logged in!' );
+      }
+      if( client.authenticated() ) {
+        client.emissions.message({
+          game: 1337,
+          name: client.getUser().username,
+          message: data.message
+        });
       }
     });
 

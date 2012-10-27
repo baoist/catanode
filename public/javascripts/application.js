@@ -10,7 +10,7 @@ jQuery(document).ready(function() {
     console.log( foo );
   });
 
-  socket.receive("game_message", function(foo) {
-    console.log( foo );
+  socket.receive("game_message", function( data ) {
+    alert( data.from + " says: " + data.message );
   });
 });
