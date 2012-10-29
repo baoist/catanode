@@ -9,10 +9,12 @@ module.exports = function(app, io, gameserver, passport, db) {
   });
 
   app.get('/create', function(req, res) {
-    var game_id = gameserver.create();
+    var game = gameserver.create();
 
-    if( typeof game_id === "number" ) {
-      return res.redirect( '/connect/' + game_id );
+    console.log( game );
+    console.log( typeof game.id === "number" );
+    if( typeof game.id === "number" ) {
+      return res.redirect( '/connect/' + game.id );
     } else {
       return res.render('error', {
         reason: "Too many games are going on."
@@ -26,10 +28,10 @@ module.exports = function(app, io, gameserver, passport, db) {
 
   app.get('/connect/:game_id', function(req, res) {
     if( !gameserver.games[req.params.game_id] ) {
-      var new_id = gameserver.create(req.params.game_id);
+      var game = gameserver.games[ req.params.game_id ] || gameserver.create( req.params.game_id );
 
-      if (new_id !== req.params.game_id) {
-        return res.redirect('/connect/' + new_id);
+      if (game.id !== req.params.game_id) {
+        return res.redirect('/connect/' + game.id);
       }
     }
 
@@ -37,7 +39,11 @@ module.exports = function(app, io, gameserver, passport, db) {
       io.client.join( req.params.game_id );
 
       // emit a user has joined 'game_view'
-      io.client.in( '/' + req.params.game_id ).emit("game_view", { game: req.params.game_id, user: req.user.username });
+      io.client.emissions.message({
+        game: req.params.game_id,
+        message: req.user.username + " has joined the server"
+      });
+      //io.client.in( '/' + req.params.game_id ).emit("game_view", { game: req.params.game_id, user: req.user.username });
     }
 
     return res.render('setup', {

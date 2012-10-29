@@ -28,6 +28,10 @@ requirejs([
     , port = process.env.PORT || 8080
     , MongooseStore = require('connect-mongoose')(express);
 
+  gameserver.startup({
+    maximum: 10000
+  });
+
   var Db = require('./access-db')
     , db = new Db.startup( "catanode-users" )
     , SessionStore = new MongooseStore;

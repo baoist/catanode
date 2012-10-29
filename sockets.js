@@ -52,18 +52,9 @@ module.exports = function(express, app, io, passport, db, store) {
     });
 
     client.on('game_message', function(data) {
-      // receive game message
-      // game id (?)
-      // message
-      console.log( 'game message received' )
-      console.log( client.handshake );
-      console.log( data );
-      if( client.authenticated() ) {
-        console.log( 'You\'re logged in!' );
-      }
       if( client.authenticated() ) {
         client.emissions.message({
-          game: 1337,
+          game: data.game,
           name: client.getUser().username,
           message: data.message
         });
