@@ -11,8 +11,6 @@ module.exports = function(app, io, gameserver, passport, db) {
   app.get('/create', function(req, res) {
     var game = gameserver.create();
 
-    console.log( game );
-    console.log( typeof game.id === "number" );
     if( typeof game.id === "number" ) {
       return res.redirect( '/connect/' + game.id );
     } else {
