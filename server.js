@@ -66,5 +66,5 @@ requirejs([
   server.listen(port);
 
   console.log( "Database live at: " + Db.data.connection() );
-  console.log( "Server running at port: " + port);
+  console.log( "Server running at port: " + port );
 });

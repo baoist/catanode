@@ -79,7 +79,10 @@ module.exports = function(app, io, gameserver, passport, db) {
 
   app.get('/login', function(req, res){
     req.session.referrerURL = req.headers.referer || "/";
-    return res.render('login', { user: req.user, message: req.flash('error') });
+    return res.render('login', { 
+      user: req.user, 
+      message: req.flash('error')
+    });
   });
 
   app.post('/login',
@@ -115,7 +118,7 @@ module.exports = function(app, io, gameserver, passport, db) {
 
   app.get('/logout', function(req, res) {
     req.logout();
-    res.redirect('/');
+    res.redirect( req.headers.referer || '/' );
   });
 
   app.get('*', function(req, res) {
