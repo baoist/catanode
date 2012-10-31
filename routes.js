@@ -8,20 +8,22 @@ module.exports = function(app, io, gameserver, passport, db) {
     });
   });
 
-  app.get('/create', function(req, res) {
-    var game = gameserver.create();
+  app.get('/create', 
+    ensureAuthenticated,
+    function(req, res) {
+      var game = gameserver.create();
 
-    if( typeof game.id === "number" ) {
-      return res.redirect( '/connect/' + game.id );
-    } else {
-      return res.render('error', {
-        reason: "Too many games are going on."
-      });
-    }
+      if( typeof game.id === "number" ) {
+        return res.redirect( '/connect/' + game.id );
+      } else {
+        return res.render('error', {
+          reason: "Too many games are going on."
+        });
+      }
   });
 
   app.get('/connect', function(req, res) {
-    return res.render('index');
+      return res.redirect( '/create' );
   });
 
   app.get('/connect/:game_id', function(req, res) {
