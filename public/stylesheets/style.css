@@ -1,5 +1,11 @@
 @import url(reset.css);
 
+
+
+
+
+/* OLD START */
+
 #wrapper {
   min-width: 780px;
   max-width: 1080px;
@@ -85,4 +91,59 @@
 
 #chat input[type=submit]:hover {
   text-decoration: underline;
+}
+
+/* OLD END */
+
+body, * {
+ -webkit-box-sizing: border-box;
+ -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.wrapper {
+  min-width: 780px;
+  max-width: 1080px;
+  width: 90%;
+  margin: 0 auto;
+}
+
+nav a {
+  display: block;
+}
+
+/* HEADER */
+#logo {
+  display: block;
+  font-size: 36px;
+  float: left;
+}
+
+header nav {
+  float: right;
+}
+
+
+
+/* FOOTER */
+footer p {
+  margin-top: 5px;
+}
+
+.wrapper:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+ 
+html[xmlns] .wrapper {
+	display: block;
+}
+ 
+* html .wrapper {
+	height: 1%;
 }

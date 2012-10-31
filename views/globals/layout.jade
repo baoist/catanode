@@ -9,16 +9,17 @@ html(lang="en")
     script(type="text/javascript", src="/javascripts/application.js")
     block scripts
   body
-    header
+    header.wrapper
+      a#logo( href="/" ) Catanode
       nav
         - if( user )
           a.tooltip.settings(href="/settings/#{user.username}")= user.name.first
-          a.logout(href="/logout") sign out
+          a.logout(href="/logout") log out
         - else
           a(href="/login") log in
           a(href="/signup") sign up
     div.wrapper
       section.content
         block content
-    footer
+    footer.wrapper
       p This was created in 2011, and will hopefully launch in 2012.
