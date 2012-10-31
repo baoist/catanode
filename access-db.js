@@ -49,11 +49,12 @@ module.exports = {
   data: db_data,
 
   startup: function(dbToUse) {
-    mongoose.connect(db_data.db || db_data.connection( dbToUse ), function( err ) {
+    mongoose.connect(db_data.connection( dbToUse ), function( err ) {
       if( err ) {
         console.log( err );
       }
     });
+
     mongoose.connection.on('open', function() {
       console.log('We have connected to mongodb');
     });
@@ -66,7 +67,7 @@ module.exports = {
   saveUser: function(userInfo, callback) {
     User.find().or([{ username: userInfo.username }, { email: userInfo.email }]).exec(function(err, users) {
       if( !users || users.length < 1 ) {
-        var newUser = new User ({
+        var newUser = new User({
           name: { first: userInfo.fname, last: userInfo.lname },
           username: userInfo.username,
           email: userInfo.email,

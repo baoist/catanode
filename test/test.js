@@ -2,12 +2,12 @@ var assert = require("assert");
 
 describe('Connection', function() {
   var Db = require('../access-db')
-    , db = new Db.startup( Db.data.connection() + "/catanode-users-test" );
+    , db = new Db.startup( 'catanode-users-test' );
 
   before(function() {
-    // clear db.
+    // Clear the database
     Db.User.remove({}, function(err) { 
-       console.log('collection removed') 
+      console.log('Removed all users.');
     });
   });
 
