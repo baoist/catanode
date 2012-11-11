@@ -9,19 +9,17 @@ block content
     h1= message
   form(action='/signup', method='post')
     div
-      label First Name:
-      input(type='text', name='user[fname]')
-    div
-      label Last Name:
-      input(type='text', name='user[lname]')
+      label Name:
+      input.fname(type='text', name='user[fname]', placeholder='First')
+      input.lname(type='text', name='user[lname]', placeholder='Last')
     div
       label Email:
-      input(type='text', name='user[email]')
+      input.email(type='text', name="user[email]")
     div
       label Username:
-      input(type='text', name='user[username]')
+      input.username(type='text', name="user[username]")
     div
       label Password:
-      input(type='password', name='user[password]')
+      input.password(type='password', name="user[password]")
     div
-      input(type='submit', value='Log In')
+      input(type='submit', value='Sign Up')

@@ -55,13 +55,19 @@ module.exports = function(app, io, gameserver, passport, db) {
   });
 
   app.get('/signup', function(req, res) {
-    res.render('signup', { message: false });
+    res.render('signup', { 
+      user: req.user || false,
+      message: false 
+    });
   });
 
   app.post('/signup', function(req, res, next) {
     db.saveUser(req.body.user, function(err, user) {
       if( err ) {
-        return res.render('signup', { message: err });
+        return res.render('signup', { 
+          user: req.user || false,
+          message: err 
+        });
       } else {
         passport.authenticate('local', function(err, user, info) {
           if (err) { return next(err); }
