@@ -85,6 +85,9 @@ module.exports = function(app, io, gameserver, passport, db) {
 
   app.get('/login', function(req, res){
     req.session.referrerURL = req.headers.referer || "/";
+
+    console.log( req );
+
     return res.render('login', { 
       user: req.user, 
       message: req.flash('error')
@@ -92,7 +95,9 @@ module.exports = function(app, io, gameserver, passport, db) {
   });
 
   app.post('/login',
-    passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
+    passport.authenticate('local', 
+      { failureRedirect: '/login', 
+        failureFlash: "Invalid login credentials" }),
     function(req, res) {
       var redirectTo = "/";
       if( req.session && req.session.referrerURL ) {

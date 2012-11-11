@@ -72,20 +72,34 @@ describe('Routes', function() {
       });
     });
 
+    it('should log the user out', function( done ) {
+      browser.visit(base_url + "/logout", function() {
+        assert.ok( browser.success );
+
+        done();
+      });
+    });
+
     it('should fill out information properly', function( done ) {
       browser.visit(base_url + "/login", function() {
         assert.ok( browser.success );
 
-        browser
-          .fill('.username', fakeUser.username)
-          .fill('.password', fakeUser.password)
-          .pressButton('Log In', function( err ) {
-            assert.ok( browser.success );
+        Db.User.find({username: fakeUser.username}, function(err, users) { 
+          assert.ok( users.length > 0 );
 
-            if( !err ) {
-              done();
-            }
-          });
+          browser
+            .fill('.username', fakeUser.username)
+            .fill('.password', fakeUser.password)
+            .pressButton('Log In', function( err ) {
+              assert.ok( browser.success );
+              console.log( browser.url );
+              console.log( browser.html() );
+
+              if( !err ) {
+                done();
+              }
+            });
+        });
       });
     });
   });
