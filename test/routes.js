@@ -92,8 +92,6 @@ describe('Routes', function() {
             .fill('.password', fakeUser.password)
             .pressButton('Log In', function( err ) {
               assert.ok( browser.success );
-              console.log( browser.url );
-              console.log( browser.html() );
 
               if( !err ) {
                 done();

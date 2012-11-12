@@ -1,5 +1,7 @@
 var util = require('util');
 
+require('./lib/utility');
+
 module.exports = function(app, io, gameserver, passport, db) {
   app.get('/', function(req, res) {
     return res.render('index', {
@@ -84,13 +86,13 @@ module.exports = function(app, io, gameserver, passport, db) {
   });
 
   app.get('/login', function(req, res){
-    req.session.referrerURL = req.headers.referer || "/";
+    var login_err = req.flash('error').length > 0 ? req.flash('error') : false;
 
-    console.log( req );
+    req.session.referrerURL = req.headers.referer || "/";
 
     return res.render('login', { 
       user: req.user, 
-      message: req.flash('error')
+      message: login_err
     });
   });
 
@@ -100,7 +102,7 @@ module.exports = function(app, io, gameserver, passport, db) {
         failureFlash: "Invalid login credentials" }),
     function(req, res) {
       var redirectTo = "/";
-      if( req.session && req.session.referrerURL ) {
+      if( req.session && req.session.referrerURL && !req.session.referrerURL.includes('logout') ) {
         redirectTo = req.session.referrerURL;
       }
 
