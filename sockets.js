@@ -33,7 +33,7 @@ module.exports = function(express, app, io, passport, db, store) {
     // Lobby / Games
     client.emissions.message = function( data ) {
       // takes data.name data.message, data.game as params to emit to games.
-      io.client.in('/' + data.game ).emit('game_message', {
+      io.sockets.in( data.game ).emit('game_message', {
         from: data.name || "God",
         message: data.message
       });

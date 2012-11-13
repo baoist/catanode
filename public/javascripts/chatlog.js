@@ -8,6 +8,16 @@ jQuery(document).ready(function() {
         class: 'foo',
         id: 'bar'
       })
+    },
+    init: function() {
+
+    },
+    write: function( message ) {
+      var self = this;
+
+      this.elements.log.append(
+        self.elements.template.clone().text( message )
+      );
     }
   };
 
@@ -30,5 +40,9 @@ jQuery(document).ready(function() {
     }
     console.log( data.user )
     console.log( data );
+  });
+
+  socket.receive("game_message", function( data ) {
+    log.write( data.from + " says: " + data.message );
   });
 });
