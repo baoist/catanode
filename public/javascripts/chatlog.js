@@ -4,20 +4,39 @@ jQuery(document).ready(function() {
       container: $('#chat'),
       log: $('#display'),
       form: $('form#message'),
-      template: $('<p/>', {
-        class: 'foo',
-        id: 'bar'
-      })
+      template: function( text, className ) {
+        var template = $('<p/>'),
+          cloned = template.clone();
+
+        if( typeof text === "undefined" ) {
+          return template;
+        }
+
+        cloned.text( text );
+        cloned.attr( 'class', (typeof className === "object") ? className.join(' ') : className );
+
+        return cloned;
+      }
     },
     init: function() {
 
     },
-    write: function( message ) {
-      var self = this;
+    write: function( message, className ) {
+      var self = this
+        , template = self.elements.template( message, className || '' );
 
-      this.elements.log.append(
-        self.elements.template.clone().text( message )
-      );
+      this.elements.log.append( template );
+
+      this.forceBottom();
+    },
+    forceBottom: function() {
+      // pushes messages to most recent / bottom. 
+      var offset = 0;
+      for( var k=0, message; message = this.elements.log.children()[k++]; ) {
+        offset += $( message ).height();
+      }
+
+      this.elements.log.scrollTop( offset );
     }
   };
 
@@ -43,6 +62,6 @@ jQuery(document).ready(function() {
   });
 
   socket.receive("game_message", function( data ) {
-    log.write( data.from + " says: " + data.message );
+    log.write( data.from + " says: " + data.message, "message" );
   });
 });
