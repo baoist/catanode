@@ -1,6 +1,5 @@
 jQuery(document).ready(function() {
   var log = {
-    chatHeight: 0,
     elements: {
       container: $('#chat'),
       log: $('#display'),
