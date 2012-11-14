@@ -1,8 +1,10 @@
 jQuery(document).ready(function() {
   var log = {
+    chatHeight: 0,
     elements: {
       container: $('#chat'),
       log: $('#display'),
+      write: $('#display div').first(),
       form: $('form#message'),
       template: function( text, className ) {
         var template = $('<p/>'),
@@ -25,18 +27,13 @@ jQuery(document).ready(function() {
       var self = this
         , template = self.elements.template( message, className || '' );
 
-      this.elements.log.append( template );
+      this.elements.write.append( template );
 
       this.forceBottom();
     },
     forceBottom: function() {
       // pushes messages to most recent / bottom. 
-      var offset = 0;
-      for( var k=0, message; message = this.elements.log.children()[k++]; ) {
-        offset += $( message ).height();
-      }
-
-      this.elements.log.scrollTop( offset );
+      this.elements.log.scrollTop( this.elements.write.outerHeight() );
     }
   };
 
